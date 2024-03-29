@@ -8,7 +8,7 @@
    version="1.1"
    id="svg5"
    xml:space="preserve"
-   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
    sodipodi:docname="ellipsoid_study.svg"
    inkscape:export-filename="ellipsoid_study.png"
    inkscape:export-xdpi="200"
@@ -30,7 +30,7 @@
      showgrid="false"
      inkscape:zoom="1.4770342"
      inkscape:cx="184.15281"
-     inkscape:cy="163.16481"
+     inkscape:cy="163.50332"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
@@ -64,7 +64,7 @@
      id="layer1"
      transform="translate(0.13928044,-0.25165358)"><g
        id="g233"
-       transform="translate(-12.700002,-34.925016)"><image
+       transform="translate(-12.341739,-34.832299)"><image
          width="33.38253"
          height="36.967709"
          preserveAspectRatio="none"
