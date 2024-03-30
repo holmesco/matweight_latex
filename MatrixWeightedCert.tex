@@ -310,11 +310,11 @@ In this section, we establish a connection between the dual solution of the SDP 
 The following Lemma establishes a connection between the dual SDP and the Laplace approximation of an equivalent (local) unconstrained problem. 
 
 \begin{lemma}\label{thm:FisherInfo}
-	Suppose a given MAP estimation problem can be equivalently formulated as either a standard-form, homogenized QCQP \eqref{opt:QCQP} or as an unconstrained optimization as in \eqref{opt:unconstrained}. Since the formulations are equivalent, there exists a bijective mapping between the feasible sets, $\bm{\ell}: \mathbb{R}^p \mapsto \Omega$, where $\Omega$ is the feasible set of \eqref{opt:QCQP}. Assume that this mapping is smooth and that respective objectives are locally equal under the mapping. That is,
+	Suppose a given MAP estimation problem can be equivalently formulated as either a standard-form, homogenized QCQP \eqref{opt:QCQP} or as an unconstrained optimization as in \eqref{opt:unconstrained}. Let $\bm{z}^*$ and $\bm{x}^*$ be the optima of these formulations respectively. Given a neighborhood, $\mathcal{U} \subseteq \mathbb{R}^p$, containing $\bm{x}^*$, let $\bm{\ell}: \mathbb{R}^p \mapsto \mathbb{R}^n$ be a \emph{smooth local embedding}\footnote{We subscribe to the definition of embedding from differential geometry. That is, it is an injective map that is diffeomorphic with its image.} of $\mathcal{U}$ such that its image is the feasible set of \eqref{opt:QCQP}. Moreover, assume that the objective functions are equal under the embedding on the neighborhood $\mathcal{U}$. That is,
 	\begin{equation}
 		-\log\left(p(\bm{x} \vert \bm{\mathcal{D}})\right) = \bm{z}^T \bm{Q} \bm{z},
 	\end{equation}
-	for all $(\bm{x}, \bm{z})$ such that $\bm{z}=\mathbb{\ell}(\bm{x})$ and $\bm{x} \in \mathcal{U}$, where $\mathcal{U} \subseteq \mathbb{R}^p$ is an open subset containing the global optimum, $\bm{x}^*$, of the unconstrained optimization (i.e., $\bm{x}^* \in \mathcal{U}$). Then the FIM of $p(\bm{x} \vert \bm{\mathcal{D}})$ is given by
+	for all $(\bm{x}, \bm{z})$ such that $\bm{z}=\mathbb{\ell}(\bm{x})$ and $\bm{x} \in \mathcal{U}$. Then the FIM of $p(\bm{x} \vert \bm{\mathcal{D}})$ is given by
 	\begin{equation}
 		\bm{\Sigma}^{-1}= \bm{L}^T \bm{H}\bm{L},
 	\end{equation}
@@ -323,20 +323,20 @@ The following Lemma establishes a connection between the dual SDP and the Laplac
 
 We defer the proof of this Lemma to Supplementary Material \ref{SM:lemma1Proof}. Intuitively, the Lemma uses the fact that the local curvature of the two problems are equal on the feasible set to establish a connection between the FIM and the certificate matrix. 
 
-Note that the assumptions on the solution mapping $\bm{\ell}$ are not restrictive in our context and have very clear definitions when the feasible set is a manifold. We provide examples of how to construct such a mapping in the Supplementary Material.
+Note that the existence of the embedding, $\bm{\ell}$, is not restrictive in our context and have very clear definitions when the feasible set is a manifold. We provide examples of how to construct such a mapping in the Supplementary Material.
 
 This Lemma provides a method to extract approximate covariance matrices from a given SDP solution to the problem. It also leads to the following Lemma, which will be important to our subsequent analysis:
 \begin{lemma}\label{thm:eig_bounds}
 	Assume that the setting of Lemma \ref{thm:FisherInfo} holds. Then the following relations hold:
-	\begin{align}
-		\sigma_{min}(\bar{\bm{H}})  &\leq \sigma_{min}(\bm{\Sigma}^{-1})\Vert \bm{L} \Vert^{-2}, \\
-		\sigma_{max}(\bar{\bm{H}})  &\geq \sigma_{max}(\bm{\Sigma}^{-1})\Vert \bm{L} \Vert^{-2}, \\
-		\mbox{cond}(\bar{\bm{H}}) &\geq \mbox{cond}(\bm{\Sigma}^{-1}),
-	\end{align}
-	where $\sigma_{min}(\cdot)$ denotes the minimum eigenvalue, $\sigma_{max}$ denotes the maximum eigenvalue, $\mbox{cond}(\cdot)$ denotes the conditioning number, $\Vert \bm{L} \Vert$ is the spectral norm (maximum singular value) of $\bm{L}$ and $\bar{\bm{H}}$ is the certificate matrix with row and column corresponding to the homogenization variable removed.
+	\begin{equation}
+		\sigma_{min}(\bar{\bm{H}})  \leq \frac{\sigma_{min}(\bm{\Sigma}^{-1})}{\sigma_{min}(\bm{L})^2}, 
+	\end{equation}
+	where $\sigma_{min}(\cdot)$ denotes the smallest singular value (or eigenvalue for PSD matrices) and $\bar{\bm{H}}$ is the certificate matrix with row and column corresponding to the homogenization variable removed.
 \end{lemma}
 
-This lemma implies that tightness of the SDP relaxation is eroded as the posterior distribution becomes more uncertain. This follows from the fact that $\mbox{rank}(\bm{Z})=1$ whenever $\mbox{corank}(\bm{H})=n-1$ which is true if and only if $\bar{\bm{H}}$ has full rank.\footnote{To see why this is true, consider the first order optimality condition, $\bm{H}\bm{z}^*=\bm{0}$, and the fact that $\bm{z}^*$ is homogenized} For the same optimum, increasing uncertainty in the estimate implies that $\sigma_{min}(\bm{\Sigma}^{-1})$, and consequently $\sigma_{min}(\bar{\bm{H}})$, decrease meaning that $\bar{\bm{H}}$ is closer to being rank-deficient.  In our subsequent analyses, we will use the latter implication to understand the cause of loss of relaxation tightness when anisotropic noise is introduced to our state estimation problems. 
+This lemma implies that tightness of the SDP relaxation is eroded as the posterior distribution becomes more uncertain. This follows from the fact that $\mbox{rank}(\bm{Z})=1$ whenever $\mbox{corank}(\bm{H})=n-1$ which is true if and only if $\bar{\bm{H}}$ has full rank.\footnote{To see why this is true, consider the first order optimality condition, $\bm{H}\bm{z}^*=\bm{0}$, and the fact that $\bm{z}^*$ is homogenized} For the same optimum, increasing uncertainty in the estimate implies that $\sigma_{min}(\bm{\Sigma}^{-1})$, and consequently $\sigma_{min}(\bar{\bm{H}})$, decrease meaning that $\bar{\bm{H}}$ is closer to being rank-deficient. Note that the $\sigma_{min}(\bm{L})^2$ is a scaling that accounts for the choice of parameterization for the unconstrained optimization.
+
+In our subsequent analyses, we will use the implication above to understand the cause of loss of relaxation tightness when anisotropic noise is introduced to our state estimation problems. 
 }
 
 \section{Problem Formulations}\label{sec:Formulations}
@@ -641,20 +641,17 @@ Recalling the definition of the certificate matrix from the dual problem, \eqref
 	\mathcal{L}(\bm{z},\bm{\lambda}, \rho) = \bm{z}^T \bm{H}(\bm{\lambda}, \rho) \bm{z} - \rho.
 \end{equation*}
 
-Let $\bm{z} = \bm{z}^*+\delta\bm{z}$ and $\bm{x} = \bm{x}^*+\delta\bm{x}$ be feasible perturbations about the optimal solutions, $\bm{z}^*$ and $\bm{x}^*$ such that $\bm{x}\in\mathcal{U}$. We have $\bm{z}^* = \bm{\ell}(x^*)$ and $\bm{z}= \bm{\ell}(x)$. 
-
-Since $\bm{z} \in \Omega$ is feasible, the Lagrangian is equal to its objective and, by assumption, we have
+Let $\bm{x} = \bm{x}^*+\delta\bm{x} \in \mathcal{U}$ be a perturbation of the optimal solution, $\bm{x}^*$, of Problem \eqref{opt:unconstrained}. Let $\bm{z}= \bm{\ell}(x)$. Since $\bm{z}$ is in the feasible set of Problem \eqref{opt:QCQP}, the Lagrangian at $\bm{z}$ is equal to the objective of Problem \eqref{opt:QCQP} and, by assumption, we have
 \begin{equation*}
 	\mathcal{L}(\bm{z},\bm{\lambda}, \rho)=\mathcal{L}(\bm{\ell}(\bm{x}),\bm{\lambda}, \rho) = -\log(p(\bm{x} \vert \bm{\mathcal{D}})).
 \end{equation*}
-
-We proceed by considering second-order Taylor expansions of the left side of the equation above similar to \cite[Theorem 12.5]{nocedalNumericalOptimization2006}. Letting  $\bm{H}= \bm{H}(\bm{\lambda}^*, \rho^*)$ to simplify notation, we have
+Note that $\bm{z}^* = \bm{\ell}(x^*)$, since the $\bm{\ell}$ is diffeomorphic (i.e., bijective) on the feasible set and the objective functions are locally equal. We proceed by considering second-order Taylor expansions the Lagrangian about $\bm{z}^*$ \cite[Theorem 12.5]{nocedalNumericalOptimization2006}. Letting  $\bm{H}= \bm{H}(\bm{\lambda}^*, \rho^*)$ to simplify notation and $\delta\bm{z} = \bm{z} - \bm{z}^*$, we have
 \begin{align*}
 	\mathcal{L}(\bm{z},\bm{\lambda}^*, \rho^*) &\approx \bm{z}^T \bm{H} \bm{z} - \rho^* \\ 
 	&= (\bm{z}^*+\delta\bm{z})^T \bm{H} (\bm{z}^*+\delta\bm{z}) - \rho^* \\ 
 	&= \bm{z}^{*T} \bm{H}\bm{z}^{*} -\rho^* + \delta\bm{z}^T \bm{H}\delta\bm{z}
 \end{align*}
-where the third line follows from the first-order necessary optimality conditions ($\bm{H} \bm{z}^*=\bm{0}$). By the assumption of smoothness of $\bm{\ell}$, we have that $\delta\bm{z} = \bm{L} \delta\bm{x} = \bm{L}(\bm{x}-\bm{x}^*)$. Plugging this into the equation above, we get
+where the third line follows from the first-order necessary optimality conditions ($\bm{H} \bm{z}^*=\bm{0}$). By smoothness of the embedding, we have $\delta\bm{z} = \bm{L} \delta\bm{x} = \bm{L}(\bm{x}-\bm{x}^*)$. Plugging this into the equation above, we get
 \begin{equation*}
 	-\log(p(\bm{x} \vert \bm{\mathcal{D}})) \approx c + \delta\bm{x}^T \bm{L}^T\bm{H}\bm{L}\delta\bm{x},
 \end{equation*}
@@ -671,12 +668,19 @@ where $\eta = \exp(-c)$. This is exactly the Laplace approximation of $p(\bm{x} 
 By assumption, we have $\bm{\Sigma}^{-1} = \bm{L}^T\bm{H}\bm{L}$. Without loss of generality, assume that the homogenizing variable of $\bm{z}$ is the last element in the vector. Since this element is always equal to one, the Jacobian of the feasible set mapping is given by $\bm{L} = \begin{bmatrix}
 	\bm{L}'^T & \bm{0}^T
 \end{bmatrix}^T$. It follows that ${\Sigma}^{-1} = \bm{L}'^T\bar{\bm{H}}\bm{L}'$.
-We proceed using the Raleigh quotient characterization of eigenvalues, noting that both $\Sigma$
+
+Since $\bm{\ell}$ is injective, $\bm{L}'$ has full column rank. It follows that\footnote{See proof of Corollary 2.4.4 in \cite{golubMatrixComputations2013}.}
+\begin{equation}\label{eqn:normSandwich}
+	\sigma_{min}(\bm{L}') \Vert\bm{v}\Vert \leq  \Vert\bm{L}'\bm{v}\Vert \leq \sigma_{max}(\bm{L}')\Vert\bm{v}\Vert,
+\end{equation}
+where $\Vert\cdot\Vert$ denotes the Euclidean norm. We proceed using the Raleigh quotient characterization of eigenvalues, noting that both $\Sigma$
 \begin{align*}
-	\sigma_{min}(\bar{\bm{H}}) &= \min\limits_{\bm{y}\in\mathbb{R}^n} \frac{\bm{y}^T \bar{\bm{H}} \bm{y}}{\Vert\bm{y}\Vert^2} \\
-	&\leq \min\limits_{\substack{\bm{y}=\bm{L}'\bm{v}\\\bm{v}\in\mathbb{R}^p}} \frac{\bm{y}^T \bar{\bm{H}} \bm{y}}{\Vert\bm{y}\Vert^2} \\ 
-	&\leq \min\limits_{\bm{v}\in\mathbb{R}^p} \frac{\bm{v}^T \bm{L}'^T\bar{\bm{H}}\bm{L}' \bm{v}}{\Vert\bm{L}'\Vert^2\Vert\bm{v}\Vert^2 } 
+	\sigma_{min}(\bar{\bm{H}}) &= \min\limits_{\bm{y}\in\mathbb{R}^n} \frac{\bm{y}^T \bar{\bm{H}} \bm{y}}{\Vert\bm{y}\Vert^2} 
+	\leq \min\limits_{\substack{\bm{y}=\bm{L}'\bm{v}\\\bm{v}\in\mathbb{R}^p}} \frac{\bm{y}^T \bar{\bm{H}} \bm{y}}{\Vert\bm{y}\Vert^2} \\ 
+	&\leq \min\limits_{\bm{v}\in\mathbb{R}^p} \frac{\bm{v}^T \bm{L}'^T\bar{\bm{H}}\bm{L}' \bm{v}}{\Vert\bm{v}\Vert^2 } \frac{1}{\sigma_{min}(\bm{L}')^2} 
+	= \frac{\sigma_{min}{\bm{\Sigma}^{-1}}}{\sigma_{min}(\bm{L}')^2},
 \end{align*}
+where the first inequality follows from the fact that we are restricting the feasible set of the optimization and the second follows from \eqref{eqn:normSandwich}. Finally, note that $\sigma_{min}(\bm{L}') = \sigma_{min}(\bm{L})$
 
 \end{proof}
 
