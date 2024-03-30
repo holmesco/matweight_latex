@@ -291,11 +291,17 @@ Therefore, establishing a `threshold' below which redundant constraints are \emp
 
 
 \rev{
-\section{Extracting the Fisher Information}
+\section{Estimation Uncertainty in SDP Relaxations}
+
+In this section, we present a set of theoretical results that allow intuitions about uncertainty in state estimatation to be leveraged to understanding tightness of SDP relaxations.
 
 In MAP estimation it is often the case that we wish to ascertain not only estimates of the most likely set of parameters for a given set of data, but also the uncertainty associated with these estimates. When the posterior distribution is non-Gaussian, it can be treated as such using the Laplace approximation, in which the estimation uncertainty is captured by the Fisher Information Matrix (FIM), $\Sigma^{-1}$. In this section, we establish a connection between the dual SDP (specifically the certificate matrix, $\bm{H}$) and the uncertainty of the estimated solution.
 
-In robotic state estimation paradigms, MAP estimation is typically framed as an unconstrained optimization problem with optimization variables appropriately parameterized to ensure that constraints are not required. This is indeed the case for all of the problems that we consider here: the unconstrained form can be derived using the Lie algebra vector space of $\mbox{SE}(3)$ or $\mbox{SO}(3)$ for the pose variables. In this case, $\Sigma^{-1}$ can be extracted directly from the Hessian of the cost function (or approximation thereof).\footnote{When using Gauss-Newton to solve estimation problems, the Hessian is often approximated as the product of the Jacobian with its transpose.}
+In robotic state estimation paradigms, MAP estimation is typically framed as an unconstrained optimization problem with optimization variables appropriately parameterized to ensure that constraints are not required. This is indeed the case for all of the problems that we consider here: the unconstrained form can be derived using the Lie algebra vector space of $\mbox{SE}(3)$ or $\mbox{SO}(3)$ for the pose variables. One of the most general formulations of this optimization is given by
+\begin{equation}\label{opt:unconstrained}
+	\min\limits_{\bm{x}\in\mathbb{R}^p} -\log\left(p(\bm{x} \vert \bm{\mathcal{D}})\right),
+\end{equation}
+where $p(\bm{x} \vert \bm{\mathcal{D}})$ represents the posterior distribution of the estimated parameter $\bm{x}$ given all of the data $\bm{\mathcal{D}}$. In this case, $\Sigma^{-1}$ can be extracted directly from the Hessian of the cost function (or approximation thereof).\footnote{When using Gauss-Newton to solve estimation problems, the Hessian is often approximated as the product of the Jacobian with its transpose.} 
 
 The properties of the Fisher Information of the posterior distribution have been intensely studied in the by the robotic state estimation community \cite{censiAchievableAccuracyPose2009}. It is known that the minimum eigenvalues of the FIM (and their respective eigenvectors) characterize the worst case uncertainty in the estimate. In particular, \cite{zhangDegeneracyOptimizationbasedState2016} consider the uncertainty in estimation with respect to the geometry of the data by using a ``degeneracy factor'', which is proportional to the minimum eigenvalue of the FIM.  
 
@@ -304,29 +310,33 @@ In this section, we establish a connection between the dual solution of the SDP 
 The following Lemma establishes a connection between the dual SDP and the Laplace approximation of an equivalent (local) unconstrained problem. 
 
 \begin{lemma}\label{thm:FisherInfo}
-	Suppose a given MAP estimation problem can be equivalently formulated as either a standard-form, homogenized QCQP \eqref{opt:QCQP} or as an unconstrained optimization of the form:
-	\begin{equation}\label{opt:unconstrained}
-		\min\limits_{\bm{x}\in\mathbb{R}^p} -\log\left(p(\bm{x} \vert \bm{\mathcal{D}})\right),
+	Suppose a given MAP estimation problem can be equivalently formulated as either a standard-form, homogenized QCQP \eqref{opt:QCQP} or as an unconstrained optimization as in \eqref{opt:unconstrained}. Since the formulations are equivalent, there exists a bijective mapping between the feasible sets, $\bm{\ell}: \mathbb{R}^p \mapsto \Omega$, where $\Omega$ is the feasible set of \eqref{opt:QCQP}. Assume that this mapping is smooth and that respective objectives are locally equal under the mapping. That is,
+	\begin{equation}
+		-\log\left(p(\bm{x} \vert \bm{\mathcal{D}})\right) = \bm{z}^T \bm{Q} \bm{z},
 	\end{equation}
-	where $p(\bm{x} \vert \bm{\mathcal{D}})$ represents the posterior distribution of the parameter $\bm{x}$ given data $\bm{\mathcal{D}}$. Since the formulations are equivalent, there exists a bijective mapping $\bm{\ell}: \mathbb{R}^p \mapsto \Omega$, where $\Omega$ be the feasible set of \eqref{opt:QCQP}. Assume that this mapping is smooth and the objective functions are equal under the mapping. Then the FIM of $p(\bm{x} \vert \bm{\mathcal{D}})$ is given by
+	for all $(\bm{x}, \bm{z})$ such that $\bm{z}=\mathbb{\ell}(\bm{x})$ and $\bm{x} \in \mathcal{U}$, where $\mathcal{U} \subseteq \mathbb{R}^p$ is an open subset containing the global optimum, $\bm{x}^*$, of the unconstrained optimization (i.e., $\bm{x}^* \in \mathcal{U}$). Then the FIM of $p(\bm{x} \vert \bm{\mathcal{D}})$ is given by
 	\begin{equation}
 		\bm{\Sigma}^{-1}= \bm{L}^T \bm{H}\bm{L},
 	\end{equation}
-	where $\bm{H}$ is the dual certificate matrix and $\bm{L}$ is the Jacobian of the solution map, $\bm{L} = \frac{d}{d\bm{x}}\bm{\ell}(\bm{x})\vert_{\bm{x}=\bm{x}^*}$. 
+	where $\bm{H}$ is the dual certificate matrix at the solution and $\bm{L}$ is the Jacobian of the solution map, $\bm{L} = \frac{d}{d\bm{x}}\bm{\ell}(\bm{x})\vert_{\bm{x}=\bm{x}^*}$. 
 \end{lemma}
 
-We defer the proof of this Lemma to Supplementary Material \ref{SM:lemma1Proof}. Note that the assumptions on the solution mapping $\bm{\ell}$ are not restrictive in our context and have very clear definitions when the feasible set is a manifold. We provide examples of how to construct such a mapping in the Supplementary Material.
+We defer the proof of this Lemma to Supplementary Material \ref{SM:lemma1Proof}. Intuitively, the Lemma uses the fact that the local curvature of the two problems are equal on the feasible set to establish a connection between the FIM and the certificate matrix. 
 
-This Lemma provides a method to extract approximate covariance matrices from a given SDP solution to the problem. It also leads to the following corrollary, which will be important to our subsequent analysis:
-\begin{corollary}
-	Assume that the setting of Lemma \ref{thm:FisherInfo} holds. Then
-	\begin{equation}
-		\sigma_{min}(\bar{\bm{H}}) \Vert \bm{L} \Vert^2 \leq \sigma_{min}(\bm{\Sigma}^{-1}),
-	\end{equation}
-	where $\sigma_{min}(\bm{A})$ denotes the minimum eigenvalue of $\bm{A}$, $\Vert \bm{L} \Vert$ is the spectral norm (maximum singular value) of $\bm{L}$ and $\bar{\bm{H}}$ is the certificate matrix with row and column corresponding to the homogenization variable removed.
-\end{corollary}
+Note that the assumptions on the solution mapping $\bm{\ell}$ are not restrictive in our context and have very clear definitions when the feasible set is a manifold. We provide examples of how to construct such a mapping in the Supplementary Material.
 
-This corollary has two important implications. First, it implies that the worst-case uncertainty of our estimate is bounded by the second minimum eigenvalue of the certificate matrix. Second, it implies that tightness of the SDP relaxation is eroded as the posterior distribution becomes more uncertain. This follows from the fact that $\mbox{rank}(\bm{Z})=1$ whenever $\mbox{corank}(\bm{H})=n-1$ which is true if and only if $\bar{\bm{H}}$ is positive definite. In our subsequent analyses, we will use the latter implication to establish the cause of loss of relaxation tightness when anisotropic noise is introduced to our state estimation problems. 
+This Lemma provides a method to extract approximate covariance matrices from a given SDP solution to the problem. It also leads to the following Lemma, which will be important to our subsequent analysis:
+\begin{lemma}\label{thm:eig_bounds}
+	Assume that the setting of Lemma \ref{thm:FisherInfo} holds. Then the following relations hold:
+	\begin{align}
+		\sigma_{min}(\bar{\bm{H}})  &\leq \sigma_{min}(\bm{\Sigma}^{-1})\Vert \bm{L} \Vert^{-2}, \\
+		\sigma_{max}(\bar{\bm{H}})  &\geq \sigma_{max}(\bm{\Sigma}^{-1})\Vert \bm{L} \Vert^{-2}, \\
+		\mbox{cond}(\bar{\bm{H}}) &\geq \mbox{cond}(\bm{\Sigma}^{-1}),
+	\end{align}
+	where $\sigma_{min}(\cdot)$ denotes the minimum eigenvalue, $\sigma_{max}$ denotes the maximum eigenvalue, $\mbox{cond}(\cdot)$ denotes the conditioning number, $\Vert \bm{L} \Vert$ is the spectral norm (maximum singular value) of $\bm{L}$ and $\bar{\bm{H}}$ is the certificate matrix with row and column corresponding to the homogenization variable removed.
+\end{lemma}
+
+This lemma implies that tightness of the SDP relaxation is eroded as the posterior distribution becomes more uncertain. This follows from the fact that $\mbox{rank}(\bm{Z})=1$ whenever $\mbox{corank}(\bm{H})=n-1$ which is true if and only if $\bar{\bm{H}}$ has full rank.\footnote{To see why this is true, consider the first order optimality condition, $\bm{H}\bm{z}^*=\bm{0}$, and the fact that $\bm{z}^*$ is homogenized} For the same optimum, increasing uncertainty in the estimate implies that $\sigma_{min}(\bm{\Sigma}^{-1})$, and consequently $\sigma_{min}(\bar{\bm{H}})$, decrease meaning that $\bar{\bm{H}}$ is closer to being rank-deficient.  In our subsequent analyses, we will use the latter implication to understand the cause of loss of relaxation tightness when anisotropic noise is introduced to our state estimation problems. 
 }
 
 \section{Problem Formulations}\label{sec:Formulations}
@@ -625,22 +635,26 @@ The authors would like to thank National Sciences and Engineering Research Counc
 % \rev{
 
 \subsection{Proof of Lemma \ref{thm:FisherInfo}}\label{SM:lemma1Proof}
-
+\begin{proof}
 Recalling the definition of the certificate matrix from the dual problem, \eqref{opt:Dual}, the Lagrangian of the QCQP \eqref{opt:QCQP} can be written as
 \begin{equation*}
 	\mathcal{L}(\bm{z},\bm{\lambda}, \rho) = \bm{z}^T \bm{H}(\bm{\lambda}, \rho) \bm{z} - \rho.
 \end{equation*}
-If $\bm{z} \in \Omega$, we have that the Lagrangian is equal to its objective and $\bm{z} = \bm{\ell}(\bm{x})$. Since the objective functions are equal under the mapping we have
+
+Let $\bm{z} = \bm{z}^*+\delta\bm{z}$ and $\bm{x} = \bm{x}^*+\delta\bm{x}$ be feasible perturbations about the optimal solutions, $\bm{z}^*$ and $\bm{x}^*$ such that $\bm{x}\in\mathcal{U}$. We have $\bm{z}^* = \bm{\ell}(x^*)$ and $\bm{z}= \bm{\ell}(x)$. 
+
+Since $\bm{z} \in \Omega$ is feasible, the Lagrangian is equal to its objective and, by assumption, we have
 \begin{equation*}
-	\mathcal{L}(\bm{\ell}(\bm{x}),\bm{\lambda}, \rho) = -\log(p(\bm{x} \vert \bm{\mathcal{D}})).
+	\mathcal{L}(\bm{z},\bm{\lambda}, \rho)=\mathcal{L}(\bm{\ell}(\bm{x}),\bm{\lambda}, \rho) = -\log(p(\bm{x} \vert \bm{\mathcal{D}})).
 \end{equation*}
-We proceed by taking second-order Taylor expansions of the left side of the equation above. Following the proof of \cite[Theorem 12.5]{nocedalNumericalOptimization2006} let $\bm{z} = \bm{z}^*+\delta\bm{z}$ be a feasible perturbation about the optimal solution $\bm{z}^*$. Letting  $\bm{H}= \bm{H}(\bm{\lambda}^*, \rho^*)$ to simplify notation, we have
+
+We proceed by considering second-order Taylor expansions of the left side of the equation above similar to \cite[Theorem 12.5]{nocedalNumericalOptimization2006}. Letting  $\bm{H}= \bm{H}(\bm{\lambda}^*, \rho^*)$ to simplify notation, we have
 \begin{align*}
 	\mathcal{L}(\bm{z},\bm{\lambda}^*, \rho^*) &\approx \bm{z}^T \bm{H} \bm{z} - \rho^* \\ 
 	&= (\bm{z}^*+\delta\bm{z})^T \bm{H} (\bm{z}^*+\delta\bm{z}) - \rho^* \\ 
 	&= \bm{z}^{*T} \bm{H}\bm{z}^{*} -\rho^* + \delta\bm{z}^T \bm{H}\delta\bm{z}
 \end{align*}
-where the third line follows from the first-order necessary optimality conditions ($\bm{H} \bm{z}^*=\bm{0}$). Letting $\bm{x}^* = \bm{\ell}^{-1}(\bm{z}^*)$ be the optimal solution to Problem \eqref{opt:unconstrained} (i.e., the mode of the posterior) and $\delta\bm{x}$ be a perturbation, we have $ \delta\bm{z} \approx \bm{L}\delta\bm{x}$ by smoothness of $\bm{\ell}$. Plugging this into the equation above, we get
+where the third line follows from the first-order necessary optimality conditions ($\bm{H} \bm{z}^*=\bm{0}$). By the assumption of smoothness of $\bm{\ell}$, we have that $\delta\bm{z} = \bm{L} \delta\bm{x} = \bm{L}(\bm{x}-\bm{x}^*)$. Plugging this into the equation above, we get
 \begin{equation*}
 	-\log(p(\bm{x} \vert \bm{\mathcal{D}})) \approx c + \delta\bm{x}^T \bm{L}^T\bm{H}\bm{L}\delta\bm{x},
 \end{equation*}
@@ -648,9 +662,23 @@ where $c$ is a constant. Negating both sides and applying the exponential we get
 \begin{equation*}
 	p(\bm{x} \vert \bm{\mathcal{D}}) \approx \eta\exp\left((\bm{x}-\bm{x}^*)^T \bm{L}^T\bm{H}\bm{L}(\bm{x}-\bm{x}^*)\right),
 \end{equation*}
-where $\eta = \exp(-c)$. This is exactly the Laplace approximation of $p(\bm{x} \vert \bm{\mathcal{D}})$ with FIM, $\bm{\Sigma}^{-1} = \bm{L}^T\bm{H}\bm{L}$
+where $\eta = \exp(-c)$. This is exactly the Laplace approximation of $p(\bm{x} \vert \bm{\mathcal{D}})$ about its mode, $\bm{x}^*$, with FIM given by $\bm{\Sigma}^{-1} = \bm{L}^T\bm{H}\bm{L}$.
+\end{proof}
 
+\subsection{Proof of Lemma \ref{thm:eig_bounds}}\label{SM:lemma2Proof}
 
+\begin{proof}
+By assumption, we have $\bm{\Sigma}^{-1} = \bm{L}^T\bm{H}\bm{L}$. Without loss of generality, assume that the homogenizing variable of $\bm{z}$ is the last element in the vector. Since this element is always equal to one, the Jacobian of the feasible set mapping is given by $\bm{L} = \begin{bmatrix}
+	\bm{L}'^T & \bm{0}^T
+\end{bmatrix}^T$. It follows that ${\Sigma}^{-1} = \bm{L}'^T\bar{\bm{H}}\bm{L}'$.
+We proceed using the Raleigh quotient characterization of eigenvalues, noting that both $\Sigma$
+\begin{align*}
+	\sigma_{min}(\bar{\bm{H}}) &= \min\limits_{\bm{y}\in\mathbb{R}^n} \frac{\bm{y}^T \bar{\bm{H}} \bm{y}}{\Vert\bm{y}\Vert^2} \\
+	&\leq \min\limits_{\substack{\bm{y}=\bm{L}'\bm{v}\\\bm{v}\in\mathbb{R}^p}} \frac{\bm{y}^T \bar{\bm{H}} \bm{y}}{\Vert\bm{y}\Vert^2} \\ 
+	&\leq \min\limits_{\bm{v}\in\mathbb{R}^p} \frac{\bm{v}^T \bm{L}'^T\bar{\bm{H}}\bm{L}' \bm{v}}{\Vert\bm{L}'\Vert^2\Vert\bm{v}\Vert^2 } 
+\end{align*}
+
+\end{proof}
 
 \subsection{Cost Function Elements}\label{SM:LocCost}
 
