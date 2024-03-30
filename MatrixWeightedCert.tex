@@ -291,9 +291,9 @@ Therefore, establishing a `threshold' below which redundant constraints are \emp
 
 
 \rev{
-\section{Estimation Uncertainty in SDP Relaxations}
+\section{Estimation Uncertainty and the Dual Certificate}
 
-In this section, we present a set of theoretical results that allow intuitions about uncertainty in state estimatation to be leveraged to understanding tightness of SDP relaxations.
+In this section, we present a set of theoretical results that allow intuitions about uncertainty in state estimation to be leveraged to understanding tightness of SDP relaxations.
 
 In MAP estimation it is often the case that we wish to ascertain not only estimates of the most likely set of parameters for a given set of data, but also the uncertainty associated with these estimates. When the posterior distribution is non-Gaussian, it can be treated as such using the Laplace approximation, in which the estimation uncertainty is captured by the Fisher Information Matrix (FIM), $\Sigma^{-1}$. In this section, we establish a connection between the dual SDP (specifically the certificate matrix, $\bm{H}$) and the uncertainty of the estimated solution.
 
@@ -307,10 +307,10 @@ The properties of the Fisher Information of the posterior distribution have been
 
 In this section, we establish a connection between the dual solution of the SDP relaxation (specifically the certificate matrix, $\bm{H}$) and the Fisher Information matrix for the problem. We leverage the insights provided in \cite{zhangDegeneracyOptimizationbasedState2016} in our analyses of relaxation tightness. 
 
-The following Lemma establishes a connection between the dual SDP and the Laplace approximation of an equivalent (local) unconstrained problem. 
+The following Lemma establishes a connection between the dual SDP and the Laplace approximation of an equivalent (local) unconstrained problem. We will use the concept of an \emph{embedding} from differential geometry, which is an injective map that is diffeomorphic\footnote{Diffeomorphic implies a bijection that is differentiable and has differentiable inverse} with its image. 
 
 \begin{lemma}\label{thm:FisherInfo}
-	Suppose a given MAP estimation problem can be equivalently formulated as either a standard-form, homogenized QCQP \eqref{opt:QCQP} or as an unconstrained optimization as in \eqref{opt:unconstrained}. Let $\bm{z}^*$ and $\bm{x}^*$ be the optima of these formulations respectively. Given a neighborhood, $\mathcal{U} \subseteq \mathbb{R}^p$, containing $\bm{x}^*$, let $\bm{\ell}: \mathbb{R}^p \mapsto \mathbb{R}^n$ be a \emph{smooth local embedding}\footnote{We subscribe to the definition of embedding from differential geometry. That is, it is an injective map that is diffeomorphic with its image.} of $\mathcal{U}$ such that its image is the feasible set of \eqref{opt:QCQP}. Moreover, assume that the objective functions are equal under the embedding on the neighborhood $\mathcal{U}$. That is,
+	Suppose a given MAP estimation problem can be equivalently formulated as either a standard-form, homogenized QCQP \eqref{opt:QCQP} or as an unconstrained optimization as in \eqref{opt:unconstrained}. Let $\bm{z}^*$ and $\bm{x}^*$ be the optima of these formulations respectively. Given a neighborhood, $\mathcal{U} \subseteq \mathbb{R}^p$, containing $\bm{x}^*$, let $\bm{\ell}: \mathbb{R}^p \mapsto \mathbb{R}^n$ be a \emph{smooth local embedding} of $\mathcal{U}$ such that its image is the feasible set of \eqref{opt:QCQP}. Moreover, assume that the objective functions are equal under the embedding on the neighborhood $\mathcal{U}$. That is,
 	\begin{equation}
 		-\log\left(p(\bm{x} \vert \bm{\mathcal{D}})\right) = \bm{z}^T \bm{Q} \bm{z},
 	\end{equation}
@@ -323,7 +323,7 @@ The following Lemma establishes a connection between the dual SDP and the Laplac
 
 We defer the proof of this Lemma to Supplementary Material \ref{SM:lemma1Proof}. Intuitively, the Lemma uses the fact that the local curvature of the two problems are equal on the feasible set to establish a connection between the FIM and the certificate matrix. 
 
-Note that the existence of the embedding, $\bm{\ell}$, is not restrictive in our context and have very clear definitions when the feasible set is a manifold. We provide examples of how to construct such a mapping in the Supplementary Material.
+Note that the existence of the embedding, $\bm{\ell}$, is not restrictive in our context since the feasible set of the problems in this paper are manifolds.  We provide examples of how to construct such a mapping in the Supplementary Material.
 
 This Lemma provides a method to extract approximate covariance matrices from a given SDP solution to the problem. It also leads to the following Lemma, which will be important to our subsequent analysis:
 \begin{lemma}\label{thm:eig_bounds}
@@ -368,7 +368,7 @@ We introduce a so-called \textit{homogenizing variable}, $ w $, which is subject
 where the symmetric cost matrix, $\bm{Q}_{ik}$, \rev{is given in the Supplementary Material \ref{SM:LocCost}.}
 
 It is straightforward to show that the full cost of Problem \eqref{opt:Localize} can be constructed by permuting and summing the matrices, $\bm{Q}_{ik}$, according to edges in $\EdgeSet_m$ and a given pose variable ordering:
-\begin{equation}
+\begin{equation}\label{eqn:locVar}
 	\bm{z}^T = \begin{bmatrix}
 		\bm{c}_{1}^T & \bm{t}_1^T & \cdots &  \bm{c}_{N_p}^T & \bm{t}_{N_p}^{T} & w
 	\end{bmatrix}.
@@ -632,7 +632,7 @@ The authors would like to thank National Sciences and Engineering Research Counc
 \bibliography{MatrixWeightCert,Software}
 
 \section{Supplementary Material}
-% \rev{
+\rev{
 
 \subsection{Proof of Lemma \ref{thm:FisherInfo}}\label{SM:lemma1Proof}
 \begin{proof}
@@ -661,6 +661,39 @@ where $c$ is a constant. Negating both sides and applying the exponential we get
 \end{equation*}
 where $\eta = \exp(-c)$. This is exactly the Laplace approximation of $p(\bm{x} \vert \bm{\mathcal{D}})$ about its mode, $\bm{x}^*$, with FIM given by $\bm{\Sigma}^{-1} = \bm{L}^T\bm{H}\bm{L}$.
 \end{proof}
+
+\subsection{Example of Unconstrained Parameterization}
+
+In this section, we show an equivalent unconstrained parameterization of the single pose version of Problem \ref{opt:Localize} given in Section \ref{sec:Localization}. However, this parameterization extends easily to any of the problems given in this paper. Those familiar with state estimation over the Lie groups will recognize this parameterization as the Lie-algebra vector space parameterization. 
+
+Let $\bm{x}= \begin{bmatrix} \bm{x}_1^T & \bm{x}_2^T\end{bmatrix}^T \in \mathbb{R}^3\times\mathbb{R}^3$ be the unconstrained parameter. We relate this parameter to the variables given in \ref{opt:Localize} as follows:
+\begin{equation}
+	\bm{C}_1 = \exp(\bm{x}_1^\wedge)\bar{\bm{C}}_1, \quad \bm{t}_1 = \bm{x}_2,
+\end{equation} 
+where $\bar{\bm{C}}_1$ is the optimal value of $\bm{C}_1$ for a given problem instance, $\exp$ is the matrix exponential and $^\wedge$ is the skew-symmetric operator (see \cite{barfoot2011state} for details). We can rewrite Problem \ref{opt:Localize} as the unconstrained problem,
+\begin{equation}
+	\label{opt:LocalizeUnc}
+	\begin{array}{rl}
+		\min\limits_{\bm{x} \in \mathbb{R}^6} &\sum\limits_{k=1}^N \bm{e}_{k}^T \bm{W}_{k} \bm{e}_{k} \\
+		\mbox{where} & \bm{e}_{k} = \tilde{\bm{m}}_1^{k1} - \exp(\bm{x}_1^\wedge)\bar{\bm{C}}_1\bm{m}_0^{k0} + \bm{x}_2,
+	\end{array}
+\end{equation}
+
+From \eqref{eqn:locVar}, we see that the embedding map is given by
+\begin{equation}
+	\bm{z}=\bm{\ell}(\bm{x}) = \begin{bmatrix}
+		\vect{\exp(\bm{x}_1^\wedge)\bar{\bm{C}}_1}\\ \bm{x}_2 \\ 1
+	\end{bmatrix}.
+\end{equation}
+By construction, this map is bijective with its image in a neighborhood around $(\bar{\bm{C}}_1, \bm{0})$ and the cost functions of Problems \ref{opt:Localize} and \ref{opt:LocalizeUnc} are equal under the map. Finally, the map is smooth by the properties of Lie groups and its Jacobian is given by
+\begin{equation}
+	\bm{L} = \begin{bmatrix}
+		(\bm{I}\otimes\bar{\bm{C}}_1) \bar{\bm{G}}_d & \bm{0}\\
+		\bm{0} & \bm{I}\\
+		0 & 0
+	\end{bmatrix},
+\end{equation}
+where $\bar{\bm{G}}_d$ is a matrix of the vectorized generators of the Lie algebra (see equations 7-10 of \cite{dellaertShonanRotationAveraging2020} for a detailed derivation of the top-left block).
 
 \subsection{Proof of Lemma \ref{thm:eig_bounds}}\label{SM:lemma2Proof}
 
@@ -734,7 +767,7 @@ with
 \end{gather*}
 
 The blocks of these cost elements can be permuted according to the variable ordering defined for a given problem and the final cost matrix is obtained by summing across cost elements.
-% }
+}
 
 
 \subsection{Stereo-Camera Model}\label{SM:stereo}
