@@ -41,6 +41,7 @@
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
 \newcommand{\llabel}[1]{\hypertarget{llineno:#1}{\linelabel{#1}}}
 \newcommand{\lref}[1]{\hyperlink{llineno:#1}{\ref*{#1}}}
 
@@ -61,7 +62,7 @@
 % <-this % stops a space
 %\thanks{Manuscript received April 19, 2021; revised August 16, 2021.}
 %<-this % stops a space   
-\thanks{Connor Holmes and Timothy D. Barfoot are with the University of Toronto Robotics Institute, University of Toronto, Toronto, Ontario, Canada, \texttt{connor.holmes@mail.utoronto.ca}, \texttt{tim.barfoot@utoronto.ca}.}}% 
+\thanks{Connor Holmes, Frederike D{\"u}mbgen, and Timothy D. Barfoot are with the University of Toronto Robotics Institute, University of Toronto, Toronto, Ontario, Canada, \texttt{connor.holmes@mail.utoronto.ca}, \texttt{tim.barfoot@utoronto.ca}.}}% 
 
 % The paper headers
 \markboth{Draft, July~2023}%
@@ -117,7 +118,7 @@ In Section \ref{sec:Simulations}, we provide an in-depth, empirical study of the
 
 \subsection{Related Work}
 
-There is a large range of problems for which certifiable methods already exist. To name a few, methods for robust state estimation \cite{yangCertifiablyOptimalOutlierRobust2023,yangTEASERFastCertifiable2021}, sensor calibration \cite{wiseCertifiablyOptimalMonocular2020,giamouConvexIterationDistanceGeometric2022}, inverse kinematics \cite{giamouConvexIterationDistanceGeometric2022}, image segmentation \cite{huAcceleratedInferenceMarkov2019}, pose-graph optimization \cite{rosenSESyncCertifiablyCorrect2019}, multiple-point-set registration \cite{chaudhuryGlobalRegistrationMultiple2015, iglesiasGlobalOptimalityPoint2020}, range-only localization \cite{dumbgenSafeSmoothCertified2023}, and range-aided SLAM \cite{papaliaCertifiablyCorrectRangeAided2023} have all been explored. 
+There is a large range of problems for which certifiable methods already exist. To name a few, methods for robust state estimation \cite{yangCertifiablyOptimalOutlierRobust2023,yangTEASERFastCertifiable2021}, sensor calibration \cite{wiseCertifiablyOptimalMonocular2020,giamouConvexIterationDistanceGeometric2022}, inverse kinematics \cite{giamouConvexIterationDistanceGeometric2022}, image segmentation \cite{huAcceleratedInferenceMarkov2019}, pose-graph optimization \cite{rosenSESyncCertifiablyCorrect2019}, multiple-point-set registration \cite{chaudhuryGlobalRegistrationMultiple2015, iglesiasGlobalOptimalityPoint2020}, range-only localization \cite{dumbgenSafeSmoothCertified2023}, planar SLAM \cite{liuConvexOptimizationBased2012}, and range-aided SLAM \cite{papaliaCertifiablyCorrectRangeAided2023} have all been explored. 
 
 Many papers have considered the conditions under which a given problem \emph{can} be certified. In particular, \cite{cifuentesLocalStabilitySemidefinite2022} shows that, under certain technical conditions, problems that have zero duality gap when unperturbed (no noise) continue to enjoy zero duality gap as long as the perturbation parameter is within a bound (i.e., the underlying problem has sufficiently low noise). For state-estimation problems, this bound is often (but not always) found empirically to be larger than noise levels encountered in practice \cite{rosenSESyncCertifiablyCorrect2019, tianDistributedCertifiablyCorrect2021, erikssonRotationAveragingStrong2018}.
 
@@ -196,13 +197,15 @@ Each edge, $(i,k) \in \EdgeSet_m $, represents a measurement of the $k^{th}$ lan
 \end{equation}
 where $ \bm{d}_{ik} $ represents the (raw) measurement of landmark $k$ from the $i^{th}$ pose variable, $\bm{m}_0^{k0}$ is the location of landmark $k$ in the global frame, $ \bm{g}(\cdot) $ is an invertible, smooth, nonlinear function, and $ \bm{\epsilon}_{d,ik} $ is a zero-mean error term having normal distribution with associated covariance matrix, $ \bm{\Sigma}_{d,ik} $. 
 
-It is often desirable to convert measurements $ \bm{d}_{ik} $ to a more convenient form by inverting the measurement model (if possible) and defining 
-\begin{align}
-	\tilde{\bm{m}}_i^{ki} &= \bm{g}^{-1}(\bm{d}_{ik})\in \mathbb{R}^3 \nonumber\\
-	&=\bm{T}_i \left[\bm{m}_0^{k0^T} ~ 1\right]^T + \bm{\epsilon}_{ik}\nonumber\\
-	&= \bm{C}_i\bm{m}_0^{k0} - \bm{t}_i + \bm{\epsilon}_{ik},
-\end{align}
-where $\bm{\epsilon}_{ik} $ represents approximately Gaussian, zero-mean noise. Regardless of whether $ \bm{\Sigma}_{d,ik} $ represents isotropic noise, the (linearly-transformed) covariance of $\bm{\epsilon}_{ik} $ is typically \textit{anisotropic} and is given by
+It is often desirable to convert measurements $ \bm{d}_{ik} $ to a more convenient form by inverting the measurement model (if possible) \rev{and defining the pseudo-measurement, $\tilde{\bm{m}}_i^{ki} = \bm{g}^{-1}(\bm{d}_{ik})$, with mean given by
+\begin{equation*}
+	\mathbb{E}(\tilde{\bm{m}}_i^{ki})={C}_i\bm{m}_0^{k0} - \bm{t}_i.
+\end{equation*} 
+The deviation from the mean, given by
+\begin{equation}
+	\bm{\epsilon}_{ik} = \tilde{\bm{m}}_i^{ki} - ({C}_i\bm{m}_0^{k0} - \bm{t}_i),
+\end{equation}
+is \emph{approximately} Gaussian with zero-mean.} Regardless of whether $ \bm{\Sigma}_{d,ik} $ represents isotropic noise, the (linearly-transformed) covariance of $\bm{\epsilon}_{ik} $ is typically \textit{anisotropic} and is given by
 \begin{equation}
 	\bm{\Sigma}_{ik} = \bm{G}^T \bm{\Sigma}_{d,ik} \bm{G},
 \end{equation}
@@ -257,8 +260,8 @@ Using the Lagrangian, we can define the (convex) dual of Problem \eqref{opt:QCQP
 \begin{equation}\label{opt:Dual}
 	\begin{array}{rl}
 		d^*=\max\limits_{\bm{H},\bm{\lambda},\bm{\rho}} &-\rho \\ 
-		s.t. & \bm{H} = \bm{Q} + \rho\bm{A}_0 +\sum\limits_{i=1}^{N_c} \lambda_i \bm{A}_i, \\
-		& \bm{H} \succeq \bm{0}.
+		s.t. & \bm{H}(\bm{\lambda},\bm{\rho}) = \bm{Q} + \rho\bm{A}_0 +\sum\limits_{i=1}^{N_c} \lambda_i \bm{A}_i, \\
+		& \bm{H}(\bm{\lambda},\bm{\rho}) \succeq \bm{0}.
 	\end{array}
 \end{equation}
 Note that the positive semidefinite condition is required to ensure that the minimization of the Lagrangian over $ \bm{z} $ is finite in \eqref{eqn:Lagrangian}. Now, we can also compute the dual of Problem \eqref{opt:Dual}, yielding an SDP relaxation of the original QCQP:
@@ -270,11 +273,21 @@ Note that the positive semidefinite condition is required to ensure that the min
 		& \bm{Z} \succeq \bm{0}.
 	\end{array}
 \end{equation}
+
+\rev{\subsection{Relaxation Tightness}}
 It is well known that if the optimal solution $ \bm{Z}^* $ satisfies $ \rank{\bm{Z}^*}=1 $ then the convex relaxation is \textit{tight} to the original QCQP.\footnote{Indeed, the addition of a constraint enforcing this condition to Problem \eqref{opt:SDP} would render it equivalent to Problem \eqref{opt:QCQP}, but the resulting optimization problem would be nonconvex.} In addition, this condition implies that the solution can be factorized as $ \bm{Z}^* = \bm{z}^* \bm{z}^{*T} $, where $ \bm{z}^* $ is the \textit{globally optimal} solution of Problem \eqref{opt:QCQP}. This result has been proved rigorously by \cite{cifuentesLocalStabilitySemidefinite2022}, among others, and depends on the inherent properties of the QCQP formulation and the fact that strong duality holds \emph{generically} for SDPs.\footnote{This is subject to the usual requirement of constraint qualification. \rev{In our case, we ensure that the SDPs that we solve satisfy the Linear Independent Constraint Qualification.}}
 
-\rev{ADD NOTE HERE ABOUT CORANK OF H}
+\rev{
+In the sequel, we will also make use of the fact that strict complementarity is a \emph{generic} property of SDPs \cite{alizadehComplementarityNondegeneracySemidefinite1997}. In our context, strict complementarity implies that
+\begin{equation}
+	 \mbox{rank}(\bm{Z}^*) + \mbox{rank}(\bm{H}^*)=n,
+\end{equation}
+where $\bm{H}^*$ represents the dual matrix at the optimal Lagrange multipliers $(\bm{\lambda}^*,\bm{\rho}^*)$.\footnote{We replace $\bm{H}(\bm{\lambda},\bm{\rho})$ with $\bm{H}$ when it is clear from the context.} In turn, the relaxation is tight if and only if $\mbox{corank}(\bm{H}^*)=1$. Empirically, we can study tightness by considering the largest eigenvalues of $\bm{Z}^*$ or by considering the smallest eigenvalues of $\bm{H}^*$.
+}
 
-This development provides two means of obtaining the globally optimal solutions to the QCQP:
+\rev{\subsection{Certification in Practice}}
+
+The preceding development provides two means of obtaining the globally optimal solutions to the QCQP:
 \begin{enumerate}
 	\item We can solve Problem \eqref{opt:SDP} directly and verify (numerically) that the rank of the optimal solution, $ \bm{Z}^* $, is equal to one. The factorization $ \bm{Z}^* = \bm{z}^* \bm{z}^{*T} $ yields the globally optimal solution, $ \bm{z}^* $, to the QCQP.
 	\item Given a candidate solution, $ \hat{\bm{z}} $, found via a fast, local-optimization method, we can determine the corresponding \textit{unique} Lagrange multipliers, $ \rho $ and $ \bm{\lambda} $, via first-order optimality conditions. Finally, if $ \bm{H} $ is positive semidefinite, then we have a \textit{certificate} of global optimality. For this reason, we refer to $ \bm{H} $ as the \textit{certificate matrix}.
@@ -287,11 +300,13 @@ Additionally, if it is known \textit{a priori} that strong duality holds for a g
 
 We once again stress that when redundant constraints are used to tighten SDP relaxations, these low-rank, fast SDP relaxation techniques are precluded.\footnote{This is due, in part, to a technical assumption in the Burer-Monteiro method that has not yet been fully explored in the literature. It may yet be possible to use these methods even with redundant constraints.} The use of redundant constraints also prevents fast certification of minima found via local methods, since the Lagrange multipliers, $ \bm{\lambda} $, are no longer uniquely determined by the first-order optimality conditions. In this case, certification effectively amounts to solving an SDP via interior-point methods, though there has been some success in applying methods such as \textit{Douglas-Rachford Splitting} \cite{yangTEASERFastCertifiable2021}. As a result, the use of redundant constraints for medium-to-large perception problems leads to runtimes that are currently prohibitive for real-time application.
 
+\rev{NOT CERTAIN THAT WE CAN ACTUALLY DO THIS NEXT THING. IF NOT, STORY NEEDS TO CHANGE.}
+
 Therefore, establishing a `threshold' below which redundant constraints are \emph{not} necessary is crucial for distinguishing the robotics problems that can be globally solved in realtime via state-of-the-art techniques. Indeed, a goal of this paper is to determine this threshold for estimation problems that involve matrix weights.
 
 
 \rev{
-\section{Estimation Uncertainty and the Dual Certificate}
+\section{Estimation Uncertainty and the Dual Certificate}\label{sec:Uncertainty}
 
 In this section, we present a set of theoretical results that allow intuitions about uncertainty in state estimation to be leveraged to understanding tightness of SDP relaxations.
 
@@ -321,20 +336,22 @@ The following Lemma establishes a connection between the dual SDP and the Laplac
 	where $\bm{H}$ is the dual certificate matrix at the solution and $\bm{L}$ is the Jacobian of the solution map, $\bm{L} = \frac{d}{d\bm{x}}\bm{\ell}(\bm{x})\vert_{\bm{x}=\bm{x}^*}$. 
 \end{lemma}
 
-We defer the proof of this Lemma to Supplementary Material \ref{SM:lemma1Proof}. Intuitively, the Lemma uses the fact that the local curvature of the two problems are equal on the feasible set to establish a connection between the FIM and the certificate matrix. 
+One implication of this Lemma is that the certificate matrix can be interpreted as an information matrix in the higher-dimensional, SDP space. We defer the proof of this Lemma to Supplementary Material \ref{SM:lemma1Proof}. Intuitively, the Lemma uses the fact that the local curvature of the two problems are equal on the feasible set to establish a connection between the FIM and the certificate matrix. 
 
 Note that the existence of the embedding, $\bm{\ell}$, is not restrictive in our context since the feasible set of the problems in this paper are manifolds.  We provide examples of how to construct such a mapping in the Supplementary Material.
 
 This Lemma provides a method to extract approximate covariance matrices from a given SDP solution to the problem. It also leads to the following Lemma, which will be important to our subsequent analysis:
-\begin{lemma}\label{thm:eig_bounds}
+\begin{proposition}\label{thm:eig_bounds}
 	Assume that the setting of Lemma \ref{thm:FisherInfo} holds. Then the following relations hold:
 	\begin{equation}
 		\sigma_{min}(\bar{\bm{H}})  \leq \frac{\sigma_{min}(\bm{\Sigma}^{-1})}{\sigma_{min}(\bm{L})^2}, 
 	\end{equation}
 	where $\sigma_{min}(\cdot)$ denotes the smallest singular value (or eigenvalue for PSD matrices) and $\bar{\bm{H}}$ is the certificate matrix with row and column corresponding to the homogenization variable removed.
-\end{lemma}
+\end{proposition}
 
-This lemma implies that tightness of the SDP relaxation is eroded as the posterior distribution becomes more uncertain. This follows from the fact that $\mbox{rank}(\bm{Z})=1$ whenever $\mbox{corank}(\bm{H})=n-1$ which is true if and only if $\bar{\bm{H}}$ has full rank.\footnote{To see why this is true, consider the first order optimality condition, $\bm{H}\bm{z}^*=\bm{0}$, and the fact that $\bm{z}^*$ is homogenized} For the same optimum, increasing uncertainty in the estimate implies that $\sigma_{min}(\bm{\Sigma}^{-1})$, and consequently $\sigma_{min}(\bar{\bm{H}})$, decrease meaning that $\bar{\bm{H}}$ is closer to being rank-deficient. Note that the $\sigma_{min}(\bm{L})^2$ is a scaling that accounts for the choice of parameterization for the unconstrained optimization.
+Note that the $\sigma_{min}(\bm{L})^2$ is a scaling that accounts for the choice of parameterization for the unconstrained optimization. However, for common choices of Lie algebra vector spaces, the eigenvalues of $\bm{L}$ are bounded between one and two.
+
+This proposition implies that tightness of the SDP relaxation is eroded as the posterior distribution becomes more uncertain. To see why this is true, recall that a necessary condition for tightness is that $\mbox{corank}(\bm{H})=1$, which is true if and only if $\bar{\bm{H}}$ has full rank. If there is large uncertainty in the poseterior estimate, then $\sigma_{min}(\bm{\Sigma}^{-1})$ decreases. Owing to Proposition \ref{thm:eig_bounds}, we see that the upper bound on $\sigma_{min}(\bar{\bm{H}})$ also decreases, pushing $\bar{\bm{H}}$ closer to being rank-deficient. 
 
 In our subsequent analyses, we will use the implication above to understand the cause of loss of relaxation tightness when anisotropic noise is introduced to our state estimation problems. 
 }
@@ -382,27 +399,16 @@ Since \rev{each separate } problem is small in dimension, its SDP relaxation can
 
 In the Supplementary Material \ref{SM:SDPStability}, we prove that Problem \eqref{opt:Localize} is always tight when measurement noise levels are low enough and the weighting matrices are non-degenerate.
 
-\subsection{Matrix-Weighted Localization with Relative-Pose Measurements}\label{sec:LocRelPose}
+\subsubsection{Introducing Relative-Pose Measurements}\label{sec:LocRelPose}
 
-We now consider the effect of introducing \textit{relative-pose measurements} described in Section \ref{sec:RelPoseMeas}. Adding the associated cost factors to Problem \eqref{opt:Localize}, we define the matrix-weighted localization problem with relative-pose measurements:
-\begin{equation}
-	\label{opt:LocalizeRelPose}
-	\hspace*{-10pt}\begin{array}{rl}
-		\min\limits_{\bm{C}_i,\bm{t}_i, \forall  i \in \VertSetP} &\sum\limits_{(i,k)\in\EdgeSet_m} \bm{e}_{ik}^T \bm{W}_{ik} \bm{e}_{ik} +\sum\limits_{(i,j)\in\EdgeSet_p}  \bm{e}_{ij}^T \bm{W}_{ij} \bm{e}_{ij}\\
-		\mbox{where} & \bm{e}_{ik} = \tilde{\bm{m}}_i^{ki} - \bm{C}_i\bm{m}_0^{k0} + \bm{t}_i , \\
-		&\bm{e}_{ij} = \vect{\tilde{\bm{T}}_{ij}\bm{T}_j - \bm{T}_i}, \\
-		\mbox{s.t.} &\bm{C}_i^T \bm{C}_i = \bm{I},~\forall i \in \VertSetP. \\
-		& \rev{(\bm{c}_i^{1})^\times\bm{c}_i^{2} - \bm{c}_i^{3} = \bm{0},~\forall i = \VertSetP, }
-	\end{array}
-\end{equation}
-We have shown in the previous section how the pose-landmark cost factors can be expressed in the form of Problem \eqref{opt:QCQP}. It remains to show that the same is possible for the relative-pose cost factors, \eqref{eqn:rel_pose_cost}. Each edge in $\EdgeSet_p$ represents a cost element of the following form:
+We note that it is quite simple to introduce \textit{relative-pose measurements} of the form described in Section \ref{sec:RelPoseMeas} to Problem \eqref{opt:Localize} by simply adding the associated cost factors to the objective. Each edge in $\EdgeSet_p$ represents a cost element of the following form:
 \begin{equation}
 	J_{ij} = \frac{1}{\sigma^2_{ij}} \left\Vert \tilde{\bm{C}}_{ij}\bm{C}_j - \bm{C}_i\right\Vert_F^2 + \frac{1}{\tau^2_{ij}} \left\Vert \tilde{\bm{t}}^{ji}_{i} - \tilde{\bm{C}}_{ij}\bm{t}_j + \bm{t}_i \right\Vert_2^2.
 \end{equation}
 
-\rev{Each element of }the cost of Problem \eqref{opt:LocalizeRelPose} \rev{is clearly a quadratic function in the optimization variables and can be }expressed in the standard \rev{homogeneous QCQP } form, as shown in Supplementary Material \ref{SM:LocCost}. Note that Problem \eqref{opt:LocalizeRelPose} is no longer separable in terms of pose variables, meaning that directly solving the SDP relaxation becomes much slower for reasonably sized problems (e.g., $N_p \geq 20$). 
+\rev{This is clearly a quadratic function in the optimization variables and can be }expressed in the standard \rev{homogeneous QCQP } form, as shown in Supplementary Material \ref{SM:LocCost}. However, the addition of such factors provides to Problem \eqref{opt:Localize} destroys the separability property, meaning that directly solving the SDP relaxation becomes much slower for reasonably sized problems (e.g., $N_p \geq 20$). 
 
-\rev{Similar to the previous section, in some problem instances noise distribution can break the tightness of the convex relaxation. We explore this further in Section \ref{sec:NoiseAnalysis}.}
+\rev{We explore the effect of these factors on tightness in Section \ref{sec:NoiseAnalysis}.}
 
 \subsection{Matrix-Weighted Landmark-based SLAM}
 
@@ -459,7 +465,7 @@ In constrast, we have opted to \emph{discover} a smaller set of redundant constr
 
 We applied the constraint learning method to small instances of the problems defined above. We then interpreted the numerical, learned constraints and cast them as equations that are valid given the properties of $\mbox{SO}(3)$ and could be applied to problems of any size (any number of landmarks and poses). Finally, we selected a subset of these constraints that were empirically found to lead to tightness across various problem instances.
 
-As a result we found that the following set of redundant constraints could be used to tighten the localization problems (Problems \eqref{opt:Localize} and \eqref{opt:LocalizeRelPose}):
+As a result, we found that the following set of redundant constraints could be used to tighten Problem \eqref{opt:Localize}:
 \begin{subequations}\label{eqn:so3_constraints}
 	\begin{flalign}
 		\bm{C}_i \bm{C}_i^T - \bm{I} = \bm{0},
@@ -543,7 +549,7 @@ We also see that for any given level of noise, increasing anisotropicity eventua
 	\label{fig:ellipsoid_align}
 \end{figure}
 
-It is known that the tightness of SDP relaxations of least-squares perception problems depends on the level of noise in the measurements \cite{brialesConvexGlobal3D2017, rosenSESyncCertifiablyCorrect2019, cifuentesLocalStabilitySemidefinite2022}. For the case of rotational averaging, tightness of the relaxation has been linked to the magnitude of \textit{residual uncertainty} of pose estimates \cite{erikssonRotationAveragingStrong2018}. Here, we also observe that the \emph{orientation} of the uncertainty ellipsoids plays a key role in SDP tightness. This can be seen in Figure \ref{fig:wahba_axis_bnd}, in which two experiments are performed with respect to ellipsoid orientation: the random rotational perturbation of ellipsoid alignment and the `fanning out' of ray-aligned ellipsoids as the landmarks become more spread out (see diagrams in Figure \ref{fig:wahba_axis_bnd}).
+It is known that the tightness of SDP relaxations of least-squares perception problems depends on the level of noise in the measurements \cite{brialesConvexGlobal3D2017, rosenSESyncCertifiablyCorrect2019, cifuentesLocalStabilitySemidefinite2022}. For the case of rotational averaging, tightness of the relaxation has been linked to the magnitude of \textit{residual uncertainty} of pose estimates \cite{erikssonRotationAveragingStrong2018}. Here, we also observe that the \emph{orientation} of the uncertainty ellipsoids plays a key role in SDP tightness. This can be seen in Figure \ref{fig:wahba_axis_bnd}, in which two experiments are performed with respect to ellipsoid orientation: the random rotational perturbation of ellipsoid alignment \rev{(Figure \ref{fig:wahba_axis_bnd}(a))} and the `fanning out' of ray-aligned ellipsoids as the landmarks become more spread out \rev{(Figure \ref{fig:wahba_axis_bnd}(b))}.
 
 \begin{figure}[!b]
 	\centering
@@ -643,15 +649,15 @@ Recalling the definition of the certificate matrix from the dual problem, \eqref
 
 Let $\bm{x} = \bm{x}^*+\delta\bm{x} \in \mathcal{U}$ be a perturbation of the optimal solution, $\bm{x}^*$, of Problem \eqref{opt:unconstrained}. Let $\bm{z}= \bm{\ell}(x)$. Since $\bm{z}$ is in the feasible set of Problem \eqref{opt:QCQP}, the Lagrangian at $\bm{z}$ is equal to the objective of Problem \eqref{opt:QCQP} and, by assumption, we have
 \begin{equation*}
-	\mathcal{L}(\bm{z},\bm{\lambda}, \rho)=\mathcal{L}(\bm{\ell}(\bm{x}),\bm{\lambda}, \rho) = -\log(p(\bm{x} \vert \bm{\mathcal{D}})).
+	\mathcal{L}(\bm{z},\bm{\lambda}, \rho) =\mathcal{L}(\bm{\ell}(\bm{x}),\bm{\lambda}, \rho)=\bm{\ell}(\bm{x})^T\bm{Q}\bm{\ell}(\bm{x}) = -\log(p(\bm{x} \vert \bm{\mathcal{D}})).
 \end{equation*}
-Note that $\bm{z}^* = \bm{\ell}(x^*)$, since the $\bm{\ell}$ is diffeomorphic (i.e., bijective) on the feasible set and the objective functions are locally equal. We proceed by considering second-order Taylor expansions the Lagrangian about $\bm{z}^*$ \cite[Theorem 12.5]{nocedalNumericalOptimization2006}. Letting  $\bm{H}= \bm{H}(\bm{\lambda}^*, \rho^*)$ to simplify notation and $\delta\bm{z} = \bm{z} - \bm{z}^*$, we have
+Note that $\bm{z}^* = \bm{\ell}(x^*)$, since the $\bm{\ell}$ is diffeomorphic (i.e., bijective) on the feasible set and the objective functions are locally equal. We proceed by considering second-order Taylor expansions of the Lagrangian about $\bm{z}^*$.\footnote{\rev{As in \cite[Theorem 12.5]{nocedalNumericalOptimization2006} we leave the Lagrange multipliers fixed}} Letting  $\bm{H}= \bm{H}(\bm{\lambda}^*, \rho^*)$ to simplify notation and $\delta\bm{z} = \bm{z} - \bm{z}^*$, we have
 \begin{align*}
-	\mathcal{L}(\bm{z},\bm{\lambda}^*, \rho^*) &\approx \bm{z}^T \bm{H} \bm{z} - \rho^* \\ 
+	\mathcal{L}(\bm{z},\bm{\lambda}^*, \rho^*) & =\bm{z}^T \bm{H} \bm{z} - \rho^* \\ 
 	&= (\bm{z}^*+\delta\bm{z})^T \bm{H} (\bm{z}^*+\delta\bm{z}) - \rho^* \\ 
-	&= \bm{z}^{*T} \bm{H}\bm{z}^{*} -\rho^* + \delta\bm{z}^T \bm{H}\delta\bm{z}
+	&= -\rho^* + \delta\bm{z}^T \bm{H}\delta\bm{z}
 \end{align*}
-where the third line follows from the first-order necessary optimality conditions ($\bm{H} \bm{z}^*=\bm{0}$). By smoothness of the embedding, we have $\delta\bm{z} = \bm{L} \delta\bm{x} = \bm{L}(\bm{x}-\bm{x}^*)$. Plugging this into the equation above, we get
+where the third line follows from the first-order necessary optimality conditions ($\bm{H} \bm{z}^*=\bm{0}$). By smoothness of the embedding, we have $\delta\bm{z} \approx \bm{L} \delta\bm{x} = \bm{L}(\bm{x}-\bm{x}^*)$. Plugging this into the equation above, we get
 \begin{equation*}
 	-\log(p(\bm{x} \vert \bm{\mathcal{D}})) \approx c + \delta\bm{x}^T \bm{L}^T\bm{H}\bm{L}\delta\bm{x},
 \end{equation*}
@@ -668,24 +674,24 @@ In this section, we show an equivalent unconstrained parameterization of the sin
 
 Let $\bm{x}= \begin{bmatrix} \bm{x}_1^T & \bm{x}_2^T\end{bmatrix}^T \in \mathbb{R}^3\times\mathbb{R}^3$ be the unconstrained parameter. We relate this parameter to the variables given in \ref{opt:Localize} as follows:
 \begin{equation}
-	\bm{C}_1 = \exp(\bm{x}_1^\wedge)\bar{\bm{C}}_1, \quad \bm{t}_1 = \bm{x}_2,
+	\bm{C}_1 = \exp(\bm{x}_1^\wedge)\bar{\bm{C}}_1, \quad \bm{t}_1 = \bm{x}_2 + \bar{\bm{t}}_1,
 \end{equation} 
-where $\bar{\bm{C}}_1$ is the optimal value of $\bm{C}_1$ for a given problem instance, $\exp$ is the matrix exponential and $^\wedge$ is the skew-symmetric operator (see \cite{barfoot2011state} for details). We can rewrite Problem \ref{opt:Localize} as the unconstrained problem,
+where $\bar{\bm{C}}_1$ and $\bar{\bm{t}}_1$ are the optimal values of $\bm{C}_1$ and $\bm{t}_1$ (respectively) for a given problem instance, $\exp$ is the matrix exponential and $^\wedge$ is the skew-symmetric operator (see \cite{barfoot2011state} for details). We can rewrite Problem \ref{opt:Localize} as the unconstrained problem,
 \begin{equation}
 	\label{opt:LocalizeUnc}
 	\begin{array}{rl}
 		\min\limits_{\bm{x} \in \mathbb{R}^6} &\sum\limits_{k=1}^N \bm{e}_{k}^T \bm{W}_{k} \bm{e}_{k} \\
-		\mbox{where} & \bm{e}_{k} = \tilde{\bm{m}}_1^{k1} - \exp(\bm{x}_1^\wedge)\bar{\bm{C}}_1\bm{m}_0^{k0} + \bm{x}_2,
+		\mbox{where} & \bm{e}_{k} = \tilde{\bm{m}}_1^{k1} - \exp(\bm{x}_1^\wedge)\bar{\bm{C}}_1\bm{m}_0^{k0} + \bm{x}_2 + \bar{\bm{t}}_1,
 	\end{array}
 \end{equation}
 
 From \eqref{eqn:locVar}, we see that the embedding map is given by
 \begin{equation}
 	\bm{z}=\bm{\ell}(\bm{x}) = \begin{bmatrix}
-		\vect{\exp(\bm{x}_1^\wedge)\bar{\bm{C}}_1}\\ \bm{x}_2 \\ 1
+		\vect{\exp(\bm{x}_1^\wedge)\bar{\bm{C}}_1}\\ \bm{x}_2 + \bar{\bm{t}}_1 \\ 1
 	\end{bmatrix}.
 \end{equation}
-By construction, this map is bijective with its image in a neighborhood around $(\bar{\bm{C}}_1, \bm{0})$ and the cost functions of Problems \ref{opt:Localize} and \ref{opt:LocalizeUnc} are equal under the map. Finally, the map is smooth by the properties of Lie groups and its Jacobian is given by
+By construction, this map is bijective with its image in a neighborhood around $(\bar{\bm{C}}_1, \bar{\bm{t}}_1)$ and the cost functions of Problems \ref{opt:Localize} and \ref{opt:LocalizeUnc} are equal under the map. Finally, the map is smooth by the properties of Lie groups and its Jacobian is given by
 \begin{equation}
 	\bm{L} = \begin{bmatrix}
 		(\bm{I}\otimes\bar{\bm{C}}_1) \bar{\bm{G}}_d & \bm{0}\\
@@ -693,27 +699,27 @@ By construction, this map is bijective with its image in a neighborhood around $
 		0 & 0
 	\end{bmatrix},
 \end{equation}
-where $\bar{\bm{G}}_d$ is a matrix of the vectorized generators of the Lie algebra (see equations 7-10 of \cite{dellaertShonanRotationAveraging2020} for a detailed derivation of the top-left block).
+where $\bar{\bm{G}}_d$ is a matrix of the vectorized generators of the Lie algebra (see equations 7-10 of \cite{dellaertShonanRotationAveraging2020} for a detailed derivation of the top-left block). In this example it is immediate that the minimum singular value of $\bm{L}$ is exactly unity and, if applying Theorem \ref{thm:FisherInfo}, we have that minimum eigenvalue of the parameterized Information matrix exactly upper bounds the minimum eigenvalue of the certificate matrix.
 
-\subsection{Proof of Lemma \ref{thm:eig_bounds}}\label{SM:lemma2Proof}
+\subsection{Proof of Proposition \ref{thm:eig_bounds}}\label{SM:lemma2Proof}
 
 \begin{proof}
 By assumption, we have $\bm{\Sigma}^{-1} = \bm{L}^T\bm{H}\bm{L}$. Without loss of generality, assume that the homogenizing variable of $\bm{z}$ is the last element in the vector. Since this element is always equal to one, the Jacobian of the feasible set mapping is given by $\bm{L} = \begin{bmatrix}
-	\bm{L}'^T & \bm{0}^T
-\end{bmatrix}^T$. It follows that ${\Sigma}^{-1} = \bm{L}'^T\bar{\bm{H}}\bm{L}'$.
+	\bar{\bm{L}}^T & \bm{0}^T
+\end{bmatrix}^T$. It follows that ${\Sigma}^{-1} = \bar{\bm{L}}^T\bar{\bm{H}}\bar{\bm{L}}$.
 
-Since $\bm{\ell}$ is injective, $\bm{L}'$ has full column rank. It follows that\footnote{See proof of Corollary 2.4.4 in \cite{golubMatrixComputations2013}.}
+Since $\bm{\ell}$ is injective, $\bar{\bm{L}}$ has full column rank. It follows that\footnote{See proof of Corollary 2.4.4 in \cite{golubMatrixComputations2013}.}
 \begin{equation}\label{eqn:normSandwich}
-	\sigma_{min}(\bm{L}') \Vert\bm{v}\Vert \leq  \Vert\bm{L}'\bm{v}\Vert \leq \sigma_{max}(\bm{L}')\Vert\bm{v}\Vert,
+	\sigma_{min}(\bar{\bm{L}}) \Vert\bm{v}\Vert \leq  \Vert\bar{\bm{L}}\bm{v}\Vert \leq \sigma_{max}(\bar{\bm{L}})\Vert\bm{v}\Vert,
 \end{equation}
-where $\Vert\cdot\Vert$ denotes the Euclidean norm. We proceed using the Raleigh quotient characterization of eigenvalues, noting that both $\Sigma$
+where $\Vert\cdot\Vert$ denotes the Euclidean norm. We proceed using the Raleigh quotient characterization of eigenvalues, noting that both $\Sigma^{-1}$ and $\bar{\bm{H}}$ are positive definite matrices.
 \begin{align*}
 	\sigma_{min}(\bar{\bm{H}}) &= \min\limits_{\bm{y}\in\mathbb{R}^n} \frac{\bm{y}^T \bar{\bm{H}} \bm{y}}{\Vert\bm{y}\Vert^2} 
-	\leq \min\limits_{\substack{\bm{y}=\bm{L}'\bm{v}\\\bm{v}\in\mathbb{R}^p}} \frac{\bm{y}^T \bar{\bm{H}} \bm{y}}{\Vert\bm{y}\Vert^2} \\ 
-	&\leq \min\limits_{\bm{v}\in\mathbb{R}^p} \frac{\bm{v}^T \bm{L}'^T\bar{\bm{H}}\bm{L}' \bm{v}}{\Vert\bm{v}\Vert^2 } \frac{1}{\sigma_{min}(\bm{L}')^2} 
-	= \frac{\sigma_{min}{\bm{\Sigma}^{-1}}}{\sigma_{min}(\bm{L}')^2},
+	\leq \min\limits_{\substack{\bm{y}=\bar{\bm{L}}\bm{v}\\\bm{v}\in\mathbb{R}^p}} \frac{\bm{y}^T \bar{\bm{H}} \bm{y}}{\Vert\bm{y}\Vert^2} \\ 
+	&\leq \min\limits_{\bm{v}\in\mathbb{R}^p} \frac{\bm{v}^T \bar{\bm{L}}^T\bar{\bm{H}}\bar{\bm{L}} \bm{v}}{\Vert\bm{v}\Vert^2 } \frac{1}{\sigma_{min}(\bar{\bm{L}})^2} 
+	= \frac{\sigma_{min}{\bm{\Sigma}^{-1}}}{\sigma_{min}(\bar{\bm{L}})^2},
 \end{align*}
-where the first inequality follows from the fact that we are restricting the feasible set of the optimization and the second follows from \eqref{eqn:normSandwich}. Finally, note that $\sigma_{min}(\bm{L}') = \sigma_{min}(\bm{L})$
+where the first inequality follows from the fact that we are restricting the feasible set of the optimization and the second follows from \eqref{eqn:normSandwich}. Finally, note that $\sigma_{min}(\bar{\bm{L}}) = \sigma_{min}(\bm{L})$
 
 \end{proof}
 
@@ -732,8 +738,8 @@ Re-organizing terms, we see that this cost element can be written as $J_{ik}~=~\
 \begin{equation*}
 	\resizebox{0.98\columnwidth}{!}{$\begin{bmatrix}
 			\bm{m}_0^{k0}\bm{m}_0^{k0^T} \otimes \bm{W}_k  & -\bm{m}_0^{k0}\otimes\bm{W}_k & -\bm{m}_0^{k0}\otimes\bm{W}_k\tilde{\bm{m}}_i^{ki}\\
-			 -\bm{m}_0^{k0^T}\otimes\bm{W}_k & \bm{W}_k & -\bm{W}_k\tilde{\bm{m}}_i^{ki} \\
-			-\bm{m}_0^{k0^T}\otimes\tilde{\bm{m}}_i^{ki^T}\bm{W}_k & -\tilde{\bm{m}}_i^{ki^T}\bm{W}_k & \tilde{\bm{m}}_i^{ki^T}\bm{W}_k\tilde{\bm{m}}_i^{ki}
+			 -\bm{m}_0^{k0^T}\otimes\bm{W}_k & \bm{W}_k & \bm{W}_k\tilde{\bm{m}}_i^{ki} \\
+			-\bm{m}_0^{k0^T}\otimes\tilde{\bm{m}}_i^{ki^T}\bm{W}_k & \tilde{\bm{m}}_i^{ki^T}\bm{W}_k & \tilde{\bm{m}}_i^{ki^T}\bm{W}_k\tilde{\bm{m}}_i^{ki}
 		\end{bmatrix}.$}
 \end{equation*}
 
@@ -910,7 +916,7 @@ and we have re-indexed the landmarks from $1$ to $N$ for convenience. We also de
 	\end{bmatrix}.
 \end{equation*}
 Since $\bm{W}$ is full rank, we are required to show that $\rank{\bm{A}} = 12$. 
-Recall that the spectrum of a Kronecker product, $\bm{A}\otimes\bm{B}$, is given by $\left\{ \mu\lambda,~ \forall \mu \in \sigma(\bm{A}),~ \lambda \in \sigma(\bm{B})\right\}$, where $\sigma()$ denotes the spectrum of eigenvalues.
+Recall that the \rev{singular values} of a Kronecker product, $\bm{A}\otimes\bm{B}$, is given by $\left\{ \mu\lambda,~ \forall \mu \in \sigma(\bm{A}),~ \lambda \in \sigma(\bm{B})\right\}$, where $\sigma()$ denotes \rev{the set of singular values}.
 Therefore, $\rank{\bm{A}} = 12$ is equivalent to the fact that $\rank{\bm{B}}=4$. We can subtract the first row from the remaining rows of $\bm{B}$ without changing its row rank. Thus,
 \begin{equation*}
 	\rank{\bm{B}} = \rank{\begin{bmatrix}
@@ -922,9 +928,9 @@ Therefore, $\rank{\bm{A}} = 12$ is equivalent to the fact that $\rank{\bm{B}}=4$
 		(\bm{m}_0^{N0}-\bm{m}_0^{10})^T 
 	\end{bmatrix}.\\	
 \end{equation*}
-Since the landmarks are not coplanar by assumption, $\rank{\bm{D}}=3$ and, since $\rank{\bm{B}} = \rank{\bm{D}} + 1$, condition \ref{thm1:cond3}) holds.
+Since the landmarks are not coplanar by assumption, $\rank{\bm{D}}=3$ and, since $\rank{\bm{B}} = \rank{\bm{D}} + 1$, condition \ref{thm1:cond3} holds.
  
-Finally, the ACQ holds at any feasible point by the fact that $\mbox{O}(3)$ defines a radical ideal (c.f. \cite{wiseCertifiablyOptimalMonocular2020,cifuentesLocalStabilitySemidefinite2022}), giving the final condition of Theorem 3.9.
+Finally, the ACQ holds at any feasible point \rev{ by the argument given in \cite{cifuentesLocalStabilitySemidefinite2022}}, giving the final condition of Theorem 3.9.
 \end{proof}
 
 We conclude this section with two remarks. First, the assumption that the weight matrices are positive definite (i.e., not degenerate) is not strictly required as long as $\rank{\bm{A}^T \bm{W} \bm{A}}=12$ is guaranteed by sufficient measurements. As mentioned above, degenerate weight matrices were encountered in \cite{brialesConvexGlobal3D2017} when measurements of lines and planes were considered. Second, the extension of this proof to include relative-pose measurements should be straightforward since it has already been proved when \emph{only} relative-pose measurements are considered (at least for the case of a weakly connected measurement graph) \cite{rosenSESyncCertifiablyCorrect2019}.
