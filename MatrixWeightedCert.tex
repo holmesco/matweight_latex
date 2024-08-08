@@ -44,6 +44,7 @@
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}{Remark}
 
 
 % CHANGE TO BLACK TO GET NON-REVIEW VERSION
@@ -326,11 +327,11 @@ where $ \rho $ and $ \bm{\lambda} = \left[\lambda_1~\cdots~\lambda_{N_c}\right]^
 
 Since Problem \eqref{opt:SDP} is convex, it has the same optimal cost as its dual, Problem \eqref{opt:Dual}.\footnote{This is a consequence of the fact that strong duality holds for convex problems under sufficient constraint qualifications\cite{boydConvexOptimization2004}. In our case, we ensure that the SDPs that we solve satisfy the Linear Independent Constraint Qualification.} When the relaxation is tight, the optimal cost of the original QCQP, Problem \eqref{opt:QCQP}, will also be equal to the dual problem cost, a condition known as \emph{strong duality}.
 
-In the sequel, we will also make use of the fact that strict complementarity is a \emph{generic} property of SDPs~\cite{alizadehComplementarityNondegeneracySemidefinite1997}. In our context, strict complementarity implies that
+\rev{The complementary slackness conditions of \eqref{opt:SDP} and its dual, \eqref{opt:Dual}, provide the following relationship between the rank of the primal and dual solution matrices,
 \begin{equation}
-	 \mbox{rank}(\bm{Z}^*) + \mbox{rank}(\bm{H}^*)=n,
+	\mbox{rank}(\bm{Z}^*) \leq=n-\mbox{rank}(\bm{H}^*)=\mbox{corank}(\bm{H}^*),
 \end{equation}
-where $\bm{H}^*$ represents the dual matrix at the optimal Lagrange multipliers $(\bm{\lambda}^*,\rho^*)$.\footnote{We replace $\bm{H}(\bm{\lambda},\rho)$ with $\bm{H}$ when it is clear from the context.} If strict complementarity holds, then the relaxation is tight if and only if $\mbox{corank}(\bm{H}^*)=1$. Practically, this means that we can study tightness by considering either largest eigenvalues of $\bm{Z}^*$ or by considering the smallest eigenvalues of $\bm{H}^*$.
+where $\bm{H}^*$ represents the dual matrix at the optimal Lagrange multipliers $(\bm{\lambda}^*,\rho^*)$.\footnote{We replace $\bm{H}(\bm{\lambda},\rho)$ with $\bm{H}$ when it is clear from the context.} When \eqref{opt:SDP} satisfies the so-called \emph{strict complementarity} property, this inequality is binding (i.e. an equality). In the sequel, we will make use of this relationship to study the tightness of the relaxation by analyzing the dual matrix, $\bm{H}^*$, which is more directly connected to the problem data.}
 
 In practice, there are typically two ways that globally optimal solutions can be obtained for a QCQP with a tight semidefinite relaxation:
 \begin{enumerate}
@@ -510,8 +511,8 @@ In this section, we present a set of theoretical results that allows us to exten
 
 The following Lemma relates the dual SDP solution and the Laplace approximation of an equivalent (local) unconstrained problem of the form \eqref{opt:UnconstrainedMAP}. 
 
-\begin{lemma}\label{thm:FisherInfo}
-	Suppose a given MAP estimation problem can be equivalently formulated as either a standard-form, homogenized QCQP \eqref{opt:QCQP} or as an unconstrained optimization as in \eqref{opt:UnconstrainedMAP}. Let $\bm{z}^*$ and $\bm{x}^*$ be the (global) optima of these formulations, respectively. Given a neighborhood, $\mathcal{U} \subseteq \mathbb{R}^p$, containing $\bm{x}^*$, let $\bm{\ell}: \mathbb{R}^p \mapsto \mathbb{R}^n$ be a \emph{smooth, injective} map on $\mathcal{U}$, such that its image is in the feasible set of \eqref{opt:QCQP}. Moreover, let the respective objective functions be equal under the map in the neighborhood $\mathcal{U}$. That is,
+\begin{lemma}\label{lem:FisherInfo}
+	Suppose a given MAP estimation problem can be equivalently formulated as either a standard-form, homogenized QCQP \eqref{opt:QCQP} or as an unconstrained optimization as in \eqref{opt:UnconstrainedMAP}. Let $\bm{z}^*$ and $\bm{x}^*$ be the (global) optima of these formulations, respectively. Given a neighborhood, $\mathcal{U} \subseteq \mathbb{R}^p$, containing $\bm{x}^*$, let $\bm{\ell}: \mathbb{R}^p \mapsto \mathbb{R}^n$ be a \emph{smooth, injective} map on $\mathcal{U}$, such that its image is in the feasible set of \eqref{opt:QCQP}.\footnote{The existence of the mapping, $\bm{\ell}$, is not restrictive in our context. In fact, since the feasible set of the problems in this paper are smooth manifolds, this mapping can be interpreted as the \emph{inverse coordinate chart} from differential geometry.} Moreover, let the respective objective functions be equal under the map in the neighborhood $\mathcal{U}$. That is,
 	\begin{equation}
 		-\log\left(p(\bm{x} \vert \bm{\mathcal{D}})\right) = \bm{z}^T \bm{Q} \bm{z},
 	\end{equation}
@@ -523,26 +524,76 @@ The following Lemma relates the dual SDP solution and the Laplace approximation 
 \end{lemma}
 We defer the proof of this Lemma to Appendix~\ref{App:lemma1Proof}. Intuitively, the Lemma uses the fact that the local curvature of the two problems are equal on the feasible set to establish a connection between the FIM and the certificate matrix. 
 
-Note that the existence of the mapping, $\bm{\ell}$, is not restrictive in our context. In fact, since the feasible set of the problems in this paper are smooth manifolds, this mapping can be interpreted as the \emph{inverse coordinate chart} from differential geometry.  We provide examples of how to construct such a mapping for Wahba's problem in Appendix~\ref{App:UncEx}.
+One implication of this Lemma is that the certificate matrix can be interpreted as an information matrix in the higher-dimensional, SDP space. It also provides a method to extract posterior covariance matrices from a given SDP solution. 
 
-One implication of this Lemma is that the certificate matrix can be interpreted as an information matrix in the higher-dimensional, SDP space.
-It also provides a method to extract posterior covariance matrices from a given SDP solution. We use Lemma~\ref{thm:FisherInfo} in the following proposition, which will be important to our subsequent analysis:
-\begin{proposition}\label{thm:eig_bounds}
-	Assume that the setting of Lemma~\ref{thm:FisherInfo} holds. Then the following relation holds:
-	\begin{equation}
-		\sigma(\bar{\bm{H}})  \leq \frac{\sigma(\bm{\Sigma}^{-1})}{\sigma(\bm{L})^2}, 
+\rev{\subsection{Application to Wahba's Problem}
+
+To make the Lemma in the preceding section more concrete,  we show its application to Wahba's Problem, Problem~\eqref{opt:Localize}. The equivalent unconstrained parameterization of this problem is the Lie-algebra vector space parameterization (CITE).
+
+For the $i^{th}$ pose variable in Problem~\eqref{opt:Localize}, let $\bm{x}_i= \begin{bmatrix} \bm{x}_{i,r}^T & \bm{x}_{i,t}^T\end{bmatrix}^T \in \mathbb{R}^3\times\mathbb{R}^3$ be the associated variable for the unconstrained problem. We have the following relationship:
+\begin{equation}
+	\bm{C}_i = \exp(\bm{x}_{i,r}^\wedge)\bar{\bm{C}}_i, \quad \bm{t}_i = \bm{x}_{i,t} + \bar{\bm{t}}_i,
+\end{equation} 
+where $\bar{\bm{C}}_i$ and $\bar{\bm{t}}_i$ are the optimal values of $\bm{C}_i$ and $\bm{t}_i$ (respectively) for a given problem instance, $\exp$ is the matrix exponential and $^\wedge$ is the skew-symmetric operator (see~\cite{barfoot2011state} for details). We can rewrite Problem~\eqref{opt:Localize} as the unconstrained problem,
+\begin{equation}
+	\label{opt:LocalizeUnc}
+	\begin{array}{rl}
+		\min\limits_{\bm{x}_i \in \mathbb{R}^6} &\sum\limits_{(i,k)\in\EdgeSet_m} \bm{e}_{ik}^T \bm{W}_{ik} \bm{e}_{ik} \\
+		\mbox{where} & \bm{e}_{ik} = \tilde{\bm{m}}_i^{ki} - \exp(\bm{x}_{i,r}^\wedge)\bar{\bm{C}}_i\bm{m}_0^{k0} + \bm{x}_{i,t} + \bar{\bm{t}}_i,
+	\end{array}
+\end{equation}
+
+From \eqref{eqn:locVar}, we see that the solution mapping is given by
+\begin{gather}
+	\bm{z}^T=\begin{bmatrix}\bm{z}^T_1&\cdots& \bm{z}^T_n&1\end{bmatrix} \\
+	\bm{z}_i=\bm{\ell}(\bm{x}_i) = \begin{bmatrix}
+		\vect{\exp(\bm{x}_{i,r}^\wedge)\bar{\bm{C}}_i}\\ \bm{x}_{i,t} + \bar{\bm{t}}_i
+	\end{bmatrix}.
+\end{gather}
+By construction, this map is bijective with its image in a neighborhood around $(\bar{\bm{C}}_i, \bar{\bm{t}}_i)$ and the cost functions of Problems~\eqref{opt:Localize} and~\eqref{opt:LocalizeUnc} are equal under the map. Finally, the map is smooth by the properties of Lie groups and its Jacobian is given by
+\begin{equation}
+	\bm{L} = \mbox{diag}(\bm{L}_1,\dots,\bm{L}_n,0), \quad
+	\bm{L}_i = \begin{bmatrix}
+		(\bm{I}\otimes\bar{\bm{C}}_i) \bar{\bm{G}}_d & \bm{0}\\
+		\bm{0} & \bm{I}
+	\end{bmatrix},
+\end{equation}
+where $\bar{\bm{G}}_d$ is a matrix of the vectorized generators of the $\mbox{SO}(3)$ Lie algebra (see equations 7-10 of~\cite{dellaertShonanRotationAveraging2020} for a detailed derivation of the top-left block) and $\mbox{diag}()$ denotes the block-diagonal concatenation of elements in the parentheses. In this example, it can be shown that the minimum singular value of $\bm{L}$ is exactly unity and, if applying Lemma~\ref{lem:FisherInfo}, we have that the minimum eigenvalue of the parameterized FIM exactly upper bounds the minimum eigenvalue of the certificate matrix.
+
+We visualize Lemma~\ref{lem:FisherInfo} on a two-pose localization problem with stereo measurements by comparing the numerical covariance matrix (obtained by running 10000 optimization trials with different sampled noise values) with the theoretical covariance matrix (inverse of FIM of the final sample). The matrices match to numerical precision and can be seen in Figure~\ref{fig:num_cov}. 
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=\columnwidth]{figs/num_info_comparison.png}
+	\caption{\rev{Comparison of numerical covariance matrix to the theoretical covariance matrix from Theorem~\ref{lem:FisherInfo}, $\bm{\Sigma} = (\bm{L}^T\bm{H}\bm{L})^{-1}$, for a two-pose localization problem (Problem~\ref{opt:Localize}). Numerical covariance was found by considering the average sample covariance of 10000 (globally optimal) estimates.}}
+	\label{fig:num_cov}
+\end{figure}
+
+\subsection{Connection to Relaxation Tightness}
+}
+Lemma~\ref{lem:FisherInfo} can be used to relate the minimum eigenvalues of the certificate matrix and the FIM:
+\begin{lemma}\label{lem:eig_bounds}
+	Assume that the setting of Lemma~\ref{lem:FisherInfo} applies. Then we have the following relation:
+	\begin{equation}\label{eqn:eig_bound}
+		\sigma_{\min}(\bar{\bm{H}})  \leq \frac{\sigma_{\min}(\bm{\Sigma}^{-1})}{\sigma_{\min}(\bm{L})^2}, 
 	\end{equation}
-	where $\sigma(\cdot)$ denotes the smallest singular value (or eigenvalue for PSD matrices) and $\bar{\bm{H}}$ is the certificate matrix with row and column corresponding to the homogenization variable removed.
-\end{proposition}
+	where $\sigma_{\min}(\cdot)$ denotes the smallest singular value (or eigenvalue for PSD matrices \rev{, $\bar{\bm{H}}$ and $\bm{\Sigma}^{-1}$}) and $\bar{\bm{H}}$ is the certificate matrix with row and column corresponding to the homogenization variable removed.
+\end{lemma}
+The proof of this proposition is given in Appendix \ref{App:lem2Proof}. 
+\rev{The eigenvalue bound in \eqref{eqn:eig_bound} can be seen Figure \ref{fig:cert_eig_study}.
 
-The proof of this proposition is given in Appendix \ref{App:prop1Proof}.
-Note that the $\sigma(\bm{L})^2$ is a scaling that accounts for the choice of parameterization for the unconstrained optimization. However, for common choices of Lie algebra vector spaces, the eigenvalues of $\bm{L}$ are bounded between one and two.
+This relationship between eigenvalues can be used to establish the following Theorem, which links the FIM and tightness of the SDP relaxation:
+\begin{theorem}\label{thm:tight_fim}
+Assume that the setting of Lemma~\ref{lem:FisherInfo} applies and, in addition, that strict complementarity holds for the SDP relaxation, \eqref{opt:SDP}. Then the relaxation is not tight whenever the FIM, $\Sigma^{-1}$, is degenerate (i.e. has a nullspace).
+\end{theorem}
 
-This proposition implies that tightness of the SDP relaxation is eroded as the posterior distribution becomes more uncertain. To see why this is true, 
-note that if there is large uncertainty in the posterior estimate, then $\sigma(\bm{\Sigma}^{-1})$ decreases. Owing to Theorem~\ref{thm:eig_bounds}, we see that the upper bound on $\sigma(\bar{\bm{H}})$ also decreases, pushing $\bar{\bm{H}}$ closer to being rank deficient. If $\bar{\bm{H}}$ actually becomes rank deficient then $\mbox{corank}(\bm{H})>1$, and, as long as strict complementarity holds,\footnote{We acknowledge the fact that strict complementarity does not \emph{always} hold for SDPs, but have empirically observed that it holds for the problems we consider herein.} $\mbox{rank}(\bm{X}^*)>1$ and the problem becomes nontight.
+\begin{remark}[Strict Complementarity]
+	The assumption of strict complementarity is required to make exact claims on the tightness of the SDP solution. Strict complementarity is a property of SDPs that has been shown to hold \emph{generically}~\cite{alizadehComplementarityNondegeneracySemidefinite1997}. However, this property has been shown to fail in highly SDPs, such as relaxations of some combinatorial problems\cite{cifuentesLocalStabilitySemidefinite2022,silvaStrictComplementarityMaxCut2018}. Nevertheless, we have empirically observed that this property holds for the problems we consider herein.
+\end{remark}
 
-In our subsequent analyses, we will use the implication above to understand the cause of loss of relaxation tightness when anisotropic noise is introduced to our state estimation problems. 
+Degeneracy of the FIM is directly connected to high posterior uncertainty along particular dimensions of state-estimation problems \cite{zhangDegeneracyOptimizationbasedState2016}. Therefore, Theorem \ref{thm:tight_fim} establishes a connection between posterior uncertainty and relaxation tightness. 
 
+In practice, both tightness and degeneracy are continuous rather than discrete measures. We will see in next section that the tightness of the semidefinite relaxation degrades as the uncertainty of the optimal state-estimate increases. In particular, the introduction of anisotropic noise can cause accentuated uncertainty in a particular direction and erode the tightness of the semidefinite relaxation.
+}
 
 \section{Simulated Experiments}\label{sec:Simulations}
 
@@ -575,7 +626,7 @@ It is clear that the redundant constraints effectively make the problem tight ac
 
 A number of key observations can be drawn. First, we note that the tightness boundary in (a) (magenta line)\footnote{Note that this line is the same as the same boundary as shown in Figure~\ref{fig:ellipsoid_align}(c).} coincides almost exactly with the drop in the certificate matrix eigenvalue in (c), as expected.\footnote{This actually demonstrates that strict complementarity mostly holds for this problem, since a drop in rank of the certificate is exactly complemented by an increase in rank of the solution matrix.} 
 
-Second, by comparing (c), (d) and (f), we see that the introduction of redundant constraints increases the certificate eigenvalue to close to the FIM upper bound (though it does not quite attain it). It is interesting to note that the bound in Theorem~\ref{thm:eig_bounds} is quite loose without redundant constraints. 
+Second, by comparing (c), (d) and (f), we see that the introduction of redundant constraints increases the certificate eigenvalue to close to the FIM upper bound (though it does not quite attain it). It is interesting to note that the bound in Theorem~\ref{lem:eig_bounds} is quite loose without redundant constraints. 
 
 Finally, we note that the FIM changes very little when redundant constraints are introduced. This is expected, since the FIM for a given problem should not depend on the redundant constraints. We posit that slight differences that we observe between plots (e) and (f) are numerical in nature. 
 
@@ -674,7 +725,7 @@ All approaches were implemented in PyTorch. Note that the entire pipeline up to 
 \begin{figure}[]
 	\centering
 	\includegraphics[width=\columnwidth]{figs/in-the-dark-traj.png}
-	\caption{Overview of the setup and results of the outdoor stereo localization experiment introduced in Section~\ref{sec:OutdoorLoc} (map run: 2, live run: 16). (a) shows the estimated trajectory for all three methods and highlights the local minima that appear when using the Local method. (b) shows the robot (Grizzly RUV) and camera (Point Grey XB3) that were used. (c) shows an aerial view of the localization track and (d) shows the stereo-localization pipeline (with modified blocks in \color{red}{red}).}
+	\caption{Overview of the setup and results of the outdoor stereo localization experiment introduced in Section~\ref{sec:OutdoorLoc} (map run: 2, live run: 16). (a) shows the estimated trajectory for all three methods and highlights the local minima that appear when using the Local method. (b) shows the robot (Grizzly RUV) and camera (Point Grey XB3) that were used. (c) shows an aerial view of the localization track and (d) shows the stereo-localization pipeline (with modified blocks in \textcolor{red}{red}).}
 	\label{fig:inthedark}
 \end{figure}
 
@@ -764,7 +815,7 @@ The authors would like to thank Natural Sciences and Engineering Research Counci
 \appendix
 
 
-\subsection{Proof of Lemma~\ref{thm:FisherInfo}}\label{App:lemma1Proof}
+\subsection{Proof of Lemma~\ref{lem:FisherInfo}}\label{App:lemma1Proof}
 \begin{proof}
 The Lagrangian of the QCQP \eqref{opt:QCQP} can be expressed as follows~\cite{boydConvexOptimization2004}:
 \begin{equation*}
@@ -800,59 +851,7 @@ where $c$ is a constant. Since the FIM is exactly the Hessian of $-\log(p(\bm{x}
 \end{equation}
 \end{proof}
 
-We visualize Lemma~\ref{thm:FisherInfo} on a two-pose localization problem with stereo measurements by comparing the numerical covariance matrix (obtained by running 10000 optimization trials with different sampled noise values) with the theoretical covariance matrix (inverse of FIM of the final sample). The matrices match to numerical precision and can be seen in Figure~\ref{fig:num_cov}. The Jacobian of the mapping was derived as shown in next section (Appendix~\ref{App:UncEx}) and is given by
-\begin{equation*}
-	\bm{L} = \begin{bmatrix}
-		(\bm{I}\otimes\bar{\bm{C}}_1) \bar{\bm{G}}_d & \bm{0}&\bm{0}&\bm{0}\\
-		\bm{0} & \bm{I}& \bm{0}&\bm{0}\\
-		\bm{0}&\bm{0} & (\bm{I}\otimes\bar{\bm{C}}_2) \bar{\bm{G}}_d& \bm{0} \\
-		\bm{0}&\bm{0} & \bm{0} & \bm{I} \\
-		0 & 0 & 0& 0
-	\end{bmatrix}.
-\end{equation*}
-
-\begin{figure}[!ht]
-	\centering
-	\includegraphics[width=\columnwidth]{figs/num_info_comparison.png}
-	\caption{Comparison of numerical covariance matrix to the theoretical covariance matrix from Theorem~\ref{thm:FisherInfo}, $\bm{\Sigma} = (\bm{L}^T\bm{H}\bm{L})^{-1}$, for a two-pose localization problem (Problem~\ref{opt:Localize}). Numerical covariance was found by considering the average sample covariance of 10000 (globally optimal) estimates.}
-	\label{fig:num_cov}
-\end{figure}
-
-
-\subsection{Example of Unconstrained Parameterization}\label{App:UncEx}
-
-In this section, we show an equivalent unconstrained parameterization of the single pose version of Problem~\ref{opt:Localize} given in Section~\ref{sec:Localization}. This parameterization extends easily to any of the problems given in this paper. Those familiar with state estimation over Lie groups will recognize this parameterization as the Lie-algebra vector space parameterization. 
-
-Let $\bm{x}= \begin{bmatrix} \bm{x}_1^T & \bm{x}_2^T\end{bmatrix}^T \in \mathbb{R}^3\times\mathbb{R}^3$ be the unconstrained parameter. We relate this parameter to the variables given in~\ref{opt:Localize} as follows:
-\begin{equation}
-	\bm{C}_1 = \exp(\bm{x}_1^\wedge)\bar{\bm{C}}_1, \quad \bm{t}_1 = \bm{x}_2 + \bar{\bm{t}}_1,
-\end{equation} 
-where $\bar{\bm{C}}_1$ and $\bar{\bm{t}}_1$ are the optimal values of $\bm{C}_1$ and $\bm{t}_1$ (respectively) for a given problem instance, $\exp$ is the matrix exponential and $^\wedge$ is the skew-symmetric operator (see~\cite{barfoot2011state} for details). We can rewrite Problem~\eqref{opt:Localize} as the unconstrained problem,
-\begin{equation}
-	\label{opt:LocalizeUnc}
-	\begin{array}{rl}
-		\min\limits_{\bm{x} \in \mathbb{R}^6} &\sum\limits_{k=1}^N \bm{e}_{k}^T \bm{W}_{k} \bm{e}_{k} \\
-		\mbox{where} & \bm{e}_{k} = \tilde{\bm{m}}_1^{k1} - \exp(\bm{x}_1^\wedge)\bar{\bm{C}}_1\bm{m}_0^{k0} + \bm{x}_2 + \bar{\bm{t}}_1,
-	\end{array}
-\end{equation}
-
-From \eqref{eqn:locVar}, we see that the solution mapping is given by
-\begin{equation}
-	\bm{z}=\bm{\ell}(\bm{x}) = \begin{bmatrix}
-		\vect{\exp(\bm{x}_1^\wedge)\bar{\bm{C}}_1}\\ \bm{x}_2 + \bar{\bm{t}}_1 \\ 1
-	\end{bmatrix}.
-\end{equation}
-By construction, this map is bijective with its image in a neighborhood around $(\bar{\bm{C}}_1, \bar{\bm{t}}_1)$ and the cost functions of Problems~\eqref{opt:Localize} and~\eqref{opt:LocalizeUnc} are equal under the map. Finally, the map is smooth by the properties of Lie groups and its Jacobian is given by
-\begin{equation}
-	\bm{L} = \begin{bmatrix}
-		(\bm{I}\otimes\bar{\bm{C}}_1) \bar{\bm{G}}_d & \bm{0}\\
-		\bm{0} & \bm{I}\\
-		0 & 0
-	\end{bmatrix},
-\end{equation}
-where $\bar{\bm{G}}_d$ is a matrix of the vectorized generators of the Lie algebra (see equations 7-10 of~\cite{dellaertShonanRotationAveraging2020} for a detailed derivation of the top-left block). In this example, it can be shown that the minimum singular value of $\bm{L}$ is exactly unity and, if applying Lemma~\ref{thm:FisherInfo}, we have that the minimum eigenvalue of the parameterized FIM exactly upper bounds the minimum eigenvalue of the certificate matrix.
-
-\subsection{Proof of Theorem~\ref{thm:eig_bounds}}\label{App:prop1Proof}
+\subsection{Proof of Theorem~\ref{lem:eig_bounds}}\label{App:lem2Proof}
 
 \begin{proof}
 By assumption, we have $\bm{\Sigma}^{-1} = \bm{L}^T\bm{H}\bm{L}$. Without loss of generality, assume that the homogenizing variable of $\bm{z}$ is the last element in the vector. Since this element is always equal to one, the Jacobian of the feasible set mapping is given by $\bm{L}^T = \begin{bmatrix}
@@ -1117,102 +1116,6 @@ As mentioned in the main body, we plot tightness boundaries based on the paramet
 	\caption{Comparison of tightness boundary contours with and without median filter for the results in Figure~\ref{fig:ellipsoid_align}. Darker contours (marked ``filt.'' in legend) represent the smoothed contours that were used in the body text.}
 	\label{fig:filter}
 \end{figure}
-
-
-\subsection{Extended Results for Table~\ref{tbl:inthedark}}\label{App:inthedarkExt}
-
-
-\begin{longtblr}[
-	caption=Extended Results for Table~\ref{tbl:inthedark}
-	]{llrrrrr}
-	\hline
-	{Map\\Run}& {Live\\Run}&Pipeline & {Avg. \\Time\\Per\\ Pose\\ (s)} & {Long.\\RMSE\\(m)} &  {Lat.\\RMSE\\(m)} &   {Head.\\RMSE\\(deg)} \\
-	2 &       11 &         Baseline &    0.054 & 0.023 & 0.009 &  0.130 \\
-	2 &       11 &           Global &    0.120 & 0.026 & 0.014 &  0.212 \\
-	2 &       11 &            Local &    0.117 & 0.202 & 0.138 &  1.883 \\
-	2 &       11 & {Local\\(filtered)} &    0.117 & 0.031 & 0.027 &  0.448 \\
-	2 &       16 &         Baseline &    0.055 & 0.039 & 0.018 &  0.315 \\
-	2 &       16 &           Global &    0.119 & 0.043 & 0.027 &  0.439 \\
-	2 &       16 &            Local &    0.120 & 0.203 & 0.202 &  5.215 \\
-	2 &       16 & {Local\\(filtered)} &    0.120 & 0.063 & 0.049 &  0.846 \\
-	2 &       17 &         Baseline &    0.056 & 0.038 & 0.019 &  0.351 \\
-	2 &       17 &           Global &    0.122 & 0.045 & 0.028 &  0.468 \\
-	2 &       17 &            Local &    0.121 & 0.238 & 0.192 &  5.400 \\
-	2 &       17 & {Local\\(filtered)} &    0.121 & 0.062 & 0.049 &  0.864 \\
-	2 &       23 &         Baseline &    0.052 & 0.024 & 0.009 &  0.139 \\
-	2 &       23 &           Global &    0.117 & 0.027 & 0.015 &  0.213 \\
-	2 &       23 &            Local &    0.111 & 0.035 & 0.029 &  0.475 \\
-	2 &       23 & {Local\\(filtered)} &    0.111 & 0.035 & 0.029 &  0.475 \\
-	2 &       28 &         Baseline &    0.053 & 0.025 & 0.012 &  0.234 \\
-	2 &       28 &           Global &    0.119 & 0.027 & 0.019 &  0.312 \\
-	2 &       28 &            Local &    0.113 & 0.033 & 0.035 &  0.607 \\
-	2 &       28 & {Local\\(filtered)} &    0.113 & 0.033 & 0.032 &  0.547 \\
-	2 &       35 &         Baseline &    0.053 & 0.022 & 0.009 &  0.145 \\
-	2 &       35 &           Global &    0.118 & 0.025 & 0.013 &  0.208 \\
-	2 &       35 &            Local &    0.109 & 0.029 & 0.025 &  0.428 \\
-	2 &       35 & {Local\\(filtered)} &    0.109 & 0.029 & 0.025 &  0.428 \\
-	11 &       16 &         Baseline &    0.055 & 0.028 & 0.017 &  0.307 \\
-	11 &       16 &           Global &    0.120 & 0.029 & 0.023 &  0.414 \\
-	11 &       16 &            Local &    0.118 & 0.227 & 0.191 &  5.063 \\
-	11 &       16 & {Local\\(filtered)} &    0.118 & 0.038 & 0.040 &  0.715 \\
-	11 &       17 &         Baseline &    0.056 & 0.027 & 0.018 &  0.352 \\
-	11 &       17 &           Global &    0.120 & 0.126 & 0.058 &  0.455 \\
-	11 &       17 &            Local &    0.118 & 0.270 & 0.203 &  7.413 \\
-	11 &       17 & {Local\\(filtered)} &    0.118 & 0.039 & 0.040 &  0.730 \\
-	11 &       23 &         Baseline &    0.053 & 0.017 & 0.008 &  0.148 \\
-	11 &       23 &           Global &    0.118 & 0.019 & 0.012 &  0.221 \\
-	11 &       23 &            Local &    0.110 & 0.154 & 0.129 &  1.982 \\
-	11 &       23 & {Local\\(filtered)} &    0.110 & 0.024 & 0.023 &  0.401 \\
-	11 &       28 &         Baseline &    0.054 & 0.021 & 0.012 &  0.250 \\
-	11 &       28 &           Global &    0.122 & 0.026 & 0.018 &  0.337 \\
-	11 &       28 &            Local &    0.114 & 0.034 & 0.033 &  0.621 \\
-	11 &       28 & {Local\\(filtered)} &    0.114 & 0.033 & 0.032 &  0.555 \\
-	11 &       35 &         Baseline &    0.053 & 0.021 & 0.010 &  0.188 \\
-	11 &       35 &           Global &    0.117 & 0.023 & 0.015 &  0.256 \\
-	11 &       35 &            Local &    0.111 & 0.029 & 0.028 &  0.474 \\
-	11 &       35 & {Local\\(filtered)} &    0.111 & 0.029 & 0.028 &  0.474 \\
-	16 &       17 &         Baseline &    0.055 & 0.020 & 0.016 &  0.313 \\
-	16 &       17 &           Global &    0.120 & 0.016 & 0.016 &  0.321 \\
-	16 &       17 &            Local &    0.113 & 0.200 & 0.154 &  5.134 \\
-	16 &       17 & {Local\\(filtered)} &    0.113 & 0.021 & 0.024 &  0.437 \\
-	16 &       23 &         Baseline &    0.056 & 0.019 & 0.014 &  0.252 \\
-	16 &       23 &           Global &    0.122 & 0.022 & 0.018 &  0.322 \\
-	16 &       23 &            Local &    0.122 & 0.265 & 0.192 &  8.152 \\
-	16 &       23 & {Local\\(filtered)} &    0.122 & 0.029 & 0.032 &  0.550 \\
-	16 &       28 &         Baseline &    0.062 & 0.030 & 0.017 &  0.317 \\
-	16 &       28 &           Global &    0.127 & 0.034 & 0.026 &  0.414 \\
-	16 &       28 &            Local &    0.143 & 0.428 & 0.420 & 20.310 \\
-	16 &       28 & {Local\\(filtered)} &    0.143 & 0.050 & 0.047 &  0.754 \\
-	16 &       35 &         Baseline &    0.058 & 0.027 & 0.015 &  0.269 \\
-	16 &       35 &           Global &    0.123 & 0.034 & 0.024 &  0.389 \\
-	16 &       35 &            Local &    0.121 & 0.131 & 0.122 &  8.239 \\
-	16 &       35 & {Local\\(filtered)} &    0.121 & 0.045 & 0.043 &  0.736 \\
-	17 &       23 &         Baseline &    0.056 & 0.021 & 0.014 &  0.272 \\
-	17 &       23 &           Global &    0.123 & 0.022 & 0.019 &  0.360 \\
-	17 &       23 &            Local &    0.118 & 0.048 & 0.112 &  5.278 \\
-	17 &       23 & {Local\\(filtered)} &    0.118 & 0.029 & 0.033 &  0.579 \\
-	17 &       28 &         Baseline &    0.062 & 0.037 & 0.018 &  0.346 \\
-	17 &       28 &           Global &    0.125 & 0.040 & 0.029 &  0.470 \\
-	17 &       28 &            Local &    0.142 & 0.522 & 0.468 & 21.384 \\
-	17 &       28 & {Local\\(filtered)} &    0.142 & 0.049 & 0.046 &  0.764 \\
-	17 &       35 &         Baseline &    0.057 & 0.027 & 0.015 &  0.285 \\
-	17 &       35 &           Global &    0.121 & 0.035 & 0.025 &  0.421 \\
-	17 &       35 &            Local &    0.122 & 0.334 & 0.213 & 11.511 \\
-	17 &       35 & {Local\\(filtered)} &    0.122 & 0.047 & 0.044 &  0.740 \\
-	23 &       28 &         Baseline &    0.053 & 0.021 & 0.012 &  0.264 \\
-	23 &       28 &           Global &    0.120 & 0.023 & 0.017 &  0.316 \\
-	23 &       28 &            Local &    0.113 & 0.028 & 0.028 &  0.485 \\
-	23 &       28 & {Local\\(filtered)} &    0.113 & 0.028 & 0.028 &  0.485 \\
-	23 &       35 &         Baseline &    0.053 & 0.023 & 0.009 &  0.150 \\
-	23 &       35 &           Global &    0.125 & 0.025 & 0.014 &  0.210 \\
-	23 &       35 &            Local &    0.113 & 0.105 & 0.169 &  1.950 \\
-	23 &       35 & {Local\\(filtered)} &    0.113 & 0.032 & 0.029 &  0.462 \\
-	28 &       35 &         Baseline &    0.053 & 0.024 & 0.012 &  0.198 \\
-	28 &       35 &           Global &    0.118 & 0.032 & 0.018 &  0.280 \\
-	28 &       35 &            Local &    0.118 & 0.162 & 0.137 &  1.710 \\
-	28 &       35 & {Local\\(filtered)} &    0.118 & 0.040 & 0.035 &  0.560 \\
-	\hline
-\end{longtblr}
 
 
 \end{document}
