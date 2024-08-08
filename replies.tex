@@ -1,0 +1,645 @@
+\begingroup
+\onecolumn
+\setlength{\parindent}{0pt} 
+\fontsize{12}{16}\selectfont
+\titleformat{\section}{\LARGE\selectfont}{\thesection}{1em}{}
+\titleformat{\subsection}{\Large\selectfont}{\thesubsection}{1em}{}
+\titleformat{\subsubsection }{\large\selectfont\bfseries}{\thesubsection}{1em}{}
+%\titlespacing\section{0pt}{12pt plus 4pt minus 2pt}{12pt plus 2pt minus 2pt}
+%\titlespacing\subsection{0pt}{12pt plus 4pt minus 2pt}{0pt plus 2pt minus 2pt}
+%\titlespacing\subsubsection{0pt}{12pt plus 4pt minus 2pt}{0pt plus 2pt minus 2pt}
+\section*{Authors' Note}
+
+We would like to thank the Associate Editor (AE) and reviewers for their thorough reviews of our work. We have endeavoured to act on all suggestions provided and believe that the manuscript has become much stronger as a result. In what follows, we show the main comments provided by each reviewer along with our responses, which highlight the changes we have made to address the comments. Our responses will be provided in indented italic for clarity. For the sake of brevity, we omit the summaries provided by each reviewer, unless they contain comments that require a response. The revised manuscript is presented below with new and altered text highlighted in \rev{red}. We avoid highlight text that has simply been moved from one are to another.
+
+The following is a list of the main changes we have made in the revised manuscript:
+
+\begin{itemize}
+    \item We have added a new section (Section~\ref{sec:Uncertainty}) that establishes a theoretical link between the posterior estimate uncertainty in classical state estimation methods and the dual/certificate matrix of the semidefinite relaxation. Moreover, this connection provides some helpful intuitions that we can leverage when understanding the tightness boundaries in our experiments, as well as the effect of redundant constraints. While this addition was not explicitly requested by the reviewers, it provides a theoretical backing for intuitions present in the original manuscript and strengthens the overall contribution.
+    \item We have added a new experimental section in which we use the matrix-weighted Wahba's problem (single-pose version of Problem \eqref{opt:Localize}) in a real-world, outdoor, stereo-localization pipeline. We show that solving the SDP can be as performant as an off-the-shelf local optimizer (and nearly realtime). We also show that the local optimizer can get stuck in local minima even when initialized well. This addition was provided in response to (justified) criticisms that the paper only deals with toy or laboratory examples.
+    \item We have reorganized and removed less relevant content from the Background, Formulation, and Experiment sections to make the development clearer. We have also removed the localization with relative-pose measurements as a separate problem and have moved much of the cost function algebra to the appendix. The Experiment sections now follow the same order as the Formulation section. This change comes in response to comments from several reviewers about the logical flow of the paper.
+    \item We have also created a separate section (Section~\ref{sec:Tightening}) that outlines our approach to tightening these problems and differentiates the approach from our concurrent work. This change is in response to concerns from several reviewers regarding the novelty of our tightening approach.
+    \item Additionally, we have modified the original QCQPs to include all $\mbox{SO}(3)$ constraints (rather than just $\mbox{O}(3)$), based on comments from Reviewers 1 and 5.
+\end{itemize}
+
+We would also like to inform the reviewers that we intended to re-run all of the simulated experiments with 100 trials (as per request by Reviewer 5). However, we were not able to rerun the SLAM experiment in Figure~\ref{fig:stereo_slam_redun} in time for this revision. However, this experiment will be ready for the final version of the paper (if accepted) and we do not foresee that the increased number of trials will lead to any significant change in the results.
+
+\section*{Response to Associate Editor's Comments}
+
+Overall, this is an interesting work. The main contribution of the  paper is their empirical study of the impact of non-isotropic  observation models on the tightness of convex relaxations of SLAM (and  other related geometric estimation problems). The empirical findings,  however, are limited to toy problems (with 1, 2, or 10 poses) due to the poor scalability of SDP solvers.
+\begin{response}
+
+We thank the associate editor (AE) for their interest in our work. We note that although solving matrix-weighted SLAM with convex relaxations does not scale well with the number of poses, Wahba's problem still scales quite well with numbers of landmarks, as demonstrated in our new experiment section (Section~\ref{sec:OutdoorLoc}). We note that the average number of features across runs in the stereo pipeline was 542, but the approach could easily scale beyond this point. 
+
+\end{response}
+Furthermore, there's little  novelty in Section 3, where the authors rewrite least squares problems  (that are obvious instances of QCQP) in the standard QCQP form.  
+\begin{response}
+
+We agree with the AE that our derivations for the localization problems were perhaps too verbose, since they are already quadratic problems. We have moved much of these derivations into the Appendix and present only the form of the cost.
+
+However, in Section~\ref{sec:SLAM}, the original problem is \emph{quartic} in the variables, and we therefore need to introduce substitution variables to find a quadratic problem. This is a direct consequence of the presence of the matrix weights. As such, we do not consider this to be an ``obvious'' instance of a QCQP and illustrates how the matrix weighting can change the problem. We have made changes to the text to make this clearer.
+\end{response}
+
+Also, one reviewer says that the redundant constraints proposed in Eq. (25) are discovered using a technique proposed in a "concurrent paper"  by the same authors. I don't have access to that paper, but please take  a look to see if it is fair to consider them as one of the  contributions of this paper.  
+
+\begin{response}
+We now clarify this point both in our stated contributions in Section~\ref{sec:RelatedContrib} and in a section describing our tightening approach (Section~\ref{sec:Tightening}). To summarize, we used the method provided by the concurrent paper to find sets of constraints \emph{numerically} for small sample problems. We then used these numerical constraints to identify a set of equations that led to a tight relaxation for problems of larger size.
+The result is a set of \emph{algebraic} redundant constraints that can be used independently of the (numerical) tools proposed in concurrent work and that are therefore a contribution of their own.
+\end{response}
+
+The contribution of the manuscript are in the current state limited.  Whereas the experiments and their results are relevant, the technical  part and presentation can be greatly improved. Nevertheless, the  experimental analysis is conducted on a close to a toy problem in  laboratory conditions.
+
+\begin{response}
+We agree that the contributions of the original manuscript were limited. However, we believe that introduction of both the new theoretical results and the new experimental results significant improve our contribution. In particular, we now have experiments that are not toy problems and take place in an outdoor environment.
+\end{response}
+
+\section*{Response to Reviewer 1's Comments}
+
+
+Overall, this is an interesting work. The paper (with the exception of some of notations - see below) is also well written. As mentioned by the authors, the empirical findings are limited to toy problems (with 1, 2, or 10 poses) due to the poor scalability of SDP solvers, especially with redundant constraints. As a result, it is difficult to ascertain whether these findings extend to settings beyond the scope of toy problems. That said, these results are still valuable as they show non-isotropic noise models may have an adverse effect on the tightness of convex relaxations.
+\begin{response}
+
+We thank the reviewer for their interest in our work. With our new experimental results, we believe that we have shown that the methods introduced in this manuscript are useful outside of the scope of toy problems. In particular, we globally solve the matrix-weighted Wahba problem on a real-world stereo localization dataset, where we show that the local solver may converge to local minima. The global solver is comparable in computational cost but provides certifiably optimal solutions for all problem instances.
+
+\end{response}
+In my opinion, the authors can significantly improve readability by removing unnecessary coordinate frame sub/superscripts in their notation. 
+\begin{response}
+
+Where possible, we have removed unnecessary coordinate frame sub/superscripts. Namely, we have done this for all of the pose variables. Since the map variables can be represented in different frames, we have maintained the previous notation, which is consistent with~\cite{barfoot2011state}. 
+
+\end{response}
+The choice of "-t" in (2) and the explanation provided in the footnote seem quite odd.  Can you show empirical evidence that support this claim and provide an explanation? If true, further investigation of this observation would be valuable to the community.
+\begin{response}
+
+The selection of $t_i^{i0}$ as the variable for the optimization was to avoid adding unnecessary substitution variables and constraints to any of the problems (since $\bm{C}_{i0}t_0^{i0} $, a quadratic term, would then appear in the error leading to a quartic cost). As seen in the SLAM problem, making these kinds of substitutions can erode tightness. We have modified the footnotes to be consistent with this explanation.
+
+The "-t" was just to maintain notational consistency. Note that $-t_i^{i0} = t_i^{0i}$ and both represent the translation vector from frame $i$ to frame $0$, expressed in frame $i$.
+
+\end{response}
+How exactly did you obtain the boundaries (prior to smoothing) in Figs. 2-6? Are they obtained by sampling problems in the 2D pace of each figure? If so, how densely are you sampling problems within this space? Please provide a detailed description of the process. Additionally, what exactly is varied in your random trials? 
+\begin{response}
+
+We have added the requested details to the beginning of Section~\ref{sec:Simulations} and have ensured that the analyses are consistent. We also indicate how densely we sample the parameter space. Both measurement noise and locations of the landmarks are randomly generated in each trial.
+
+\end{response}
+On page 5, can you explain why "... is exactly a local minimum" is true? 
+\begin{response}
+
+This line has been removed in the current revision of the paper. However, this result follows from~\cite[Proposition 2.10]{boumalDeterministicGuaranteesBurerMonteiro2020a}, where we have already enforced the property that $\left<S,X\right> = 0$. 
+
+% \begin{proposition}
+%     Suppose strong duality holds for a given problem of the form of Problem~\ref{opt:QCQP}. Let $\hat{\bm{x}}$ be a candidate minimum with unique Lagrange multipliers $(\hat{\bm{\lambda}}, \hat{\rho})$ and let the Lagrange multipliers be uniquely determined by the first-order conditions. Then, $\hat{\bm{x}}$ is a global minimum only if $\bm{H}(\hat{\bm{\lambda}}, \hat{\rho}) \succeq \bm{0}$. 
+% \end{proposition}
+% \begin{proof}
+%     The first-order optimality conditions are given by
+%     \begin{equation*}
+%         \bm{H}(\hat{\bm{\lambda}}, \hat{\rho})\hat{\bm{x}} = \bm{0}.
+%     \end{equation*}
+%     By assumption this equation \emph{uniquely} determines the multipliers. Now, suppose $(\bm{\lambda}^*, \rho^*)$ is the optimal solution to the dual, Problem \eqref{opt:Dual}. Since strong duality holds at $\hat{\bm{x}}$, we have
+%     \begin{align*}
+%         0 &= \hat{\bm{x}}^T \bm{Q} \hat{\bm{x}} + \rho^* \\
+%         &= \hat{\bm{x}}^T \left(\bm{Q}+\sum\limits_{i=1}^m \bm{A}_i \bm{\lambda}^* + \bm{A}_0\rho\right) \hat{\bm{x}} \\
+%         &= \hat{\bm{x}}^T \bm{H}(\bm{\lambda}^*, \rho^*) \hat{\bm{x}}.
+%     \end{align*}
+%     Since $\bm{H}(\bm{\lambda}^*, \rho^*)$ is positive semidefinite, we have $\bm{H}(\bm{\lambda}^*, \rho^*) \hat{\bm{x}} = \bm{0}$, which is the same as the first-order optimality equation for $\hat{\bm{x}}$ given above. It follows that $(\bm{\lambda}^*, \rho^*) = (\hat{\bm{\lambda}}, \hat{\rho})$ and since $\bm{H}(\bm{\lambda}^*, \rho^*)\succeq\bm{0}$ by dual feasibility, we have the result, $\bm{H}(\hat{\bm{\lambda}}, \hat{\rho}) \succeq \bm{0}$.
+% \end{proof}
+
+% The contrapositive of this Proposition shows that if the certificate matrix fails to be PSD, then the solution cannot be globally optimal.
+\end{response}
+
+While studying the tightness of SDP relaxation of QCQP (with $ \mbox{O}(3) $ constraints) is valuable, for this work to be really useful I believe the authors should also check if the (rounded) solution to the $ \mbox{O}(3) $ QCQP problem (extracted from the SDP) is a valid  solution for the original estimation problem as well (i.e., achieves the same cost while satisfying the $ \mbox{SO}(3) $ constraints).
+
+\begin{response}
+We agree that, given the original formulation, it should have been shown that the solutions are valid for the original problem. However, we have changed all of our problem formulations so that the rotation variables are restricted to $ \mbox{SO}(3) $, by adding another constraint to the primal formulations (see the discussion after \eqref{opt:Localize}). We believe that this is a more principled approach to the problem.
+\end{response}
+
+"Eigenvalue ratio test" is perhaps a more appropriate name for your tightness test given that you apply it to PSD (symmetric) matrices.
+
+\begin{response}
+We agree completely with the reviewer on this point and have changed all instances of ``Singular Value Ratio (SVR)'' to ``Eigenvalue Ratio (ER)''.
+\end{response}
+
+Below (42): "Eigenvalues" should be replaced by "singular values". Also, "spectrum" usually refers to the eigenvalues. 
+
+\begin{response}
+We agree with the reviewer and have replaced ``eigenvalues'' with ``singular values'' since we are not dealing with square matrices. We have also replaced ``spectrum'' with ``set of singular values''.
+\end{response}
+
+Consider citing the following paper which (to the best of my knowledge) proposed the first QCQP->SDP relaxation for SLAM: "A convex optimization based approach for pose SLAM problems" - IROS 2012.
+\begin{response} 
+We thank the reviewer for providing this interesting reference and have added this citation.
+\end{response}
+
+If I'm not mistaken, the function of the "boundary box" used in Figs. 2 \& 3 isn't properly introduced (I guess you place landmarks randomly within the box?). 
+
+\begin{response}
+We introduced the ``bounding cube'' and the uniform distribution of the landmarks within the cube at the end of Section~\ref{sec:Simulations}. Since the image in the figure is 2D, we write ``bounding box'', but they have the same size.
+\end{response}
+
+Also, I didn't see any discussion of Fig. 3.b in the paper (I might have missed it). 
+
+\begin{response}
+Previously, these two graphs were discussed together as one result. We now separate the discussion for improved clarity (see Section~\ref{sec:SimMisalign}).
+\end{response}
+
+On page 8: I couldn't understand the following sentence: "...aggregate or posterior state-estimate uncertainty ...". Why are you referring to the *posterior* uncertainty? And what does aggregate mean here? Clarify this. 
+\begin{response}
+This comment has been removed since the original idea behind this comment has been expanded. We have added a new section that establishes a connection between posterior estimation uncertainty to the certificate matrix and use this link to better understand our findings in the noise analysis (see Section~\ref{sec:Uncertainty}).
+\end{response}
+
+It'd good to specify the tight/non-tight regions in Fig. 4 as well. 
+\begin{response}
+We thank the author for noticing this discrepancy and have added the appropriate labels to Figure~\ref{fig:stereo_redun}.
+\end{response}
+
+The idea behind Eq. (5) is poorly expressed in (5). The raw measurement (d) is a random variable. We obtain another random variable (m) after applying $g^{-1}$ to $d$. The mean and covariance of the resulting variable m is then *approximated* by $g^{-1}(\mbox{mean}(d))$ and (6), respectively. 
+\begin{response}
+We thank the reviewer for the attention to detail and agree that the idea is poorly expressed here. We have made changes according to the suggestion of the reviewer. 
+\end{response}
+
+The paper currently doesn't address a key question: how much estimation accuracy will be lost in the first place if one approximates a non-isotropic covariance with an isotropic one and subsequently use tight convex relaxation techniques for solving the resulting well-behaved problem? I ask the authors to test this on larger problems for the stereo vision observation model. Sensible choices for isotropic approximation are $\lambda_{max}(cov) * \bm{I}$ or $\mbox{diag}_{max}(cov) * \bm{I}$. 
+\begin{response}
+It is the view of the authors that this analysis lies outside of the scope of the current paper. Indeed, this kind of analysis has been performed in other papers and it has been observed that making this kind of approximation can be quite detrimental to the accuracy of the estimated state. We state this in the Background (Section~\ref{sec:LandmarkMeas}).
+
+\end{response}
+
+\section*{Response to Reviewer 5's Comments}
+
+This is a review for the manuscript entitled ``On semidefinite relaxations for Matrix-Weighted State-estimation problems in robotics'' by the authors Connor Holmes, Frederike Dümbgen and Timothy. D. Barfoot. The work introduces anisotropic weights into the localization and the SLAM problems both with point-point correspondences. The authors found that increasing the degeneracy of the weight matrix loosens the convex relaxations and additional constraints must be included. For the SLAM problem the additional set of constraints is obtained by a concurrent work by the same authors.  My main concern about the manuscript is novelty, but I have other more technical concerns and suggestions.
+
+\begin{response}
+    We thank the reviewer for their interest in our work. We understand the concern about novelty because our initial submission did not differentiate enough between the proposed solution and the concurrent work. Please note that our concurrent work is able to numerically find constraints for a given problem instance, providing a starting point to tighten a problem in general. However, additional work is required to find mathematical (symbolic) formulations of these constraints and determine which constraints are most important for tightening a problem (in our case, localization and SLAM). We now clarify this point both in our stated contributions in Section~\ref{sec:RelatedContrib} and in a section describing our tightening approach (Section~\ref{sec:Tightening}).
+
+    While we hope that this clarification puts the novelty and relevance of the proposed paper forward, we have also added a new theoretical analysis of the connection between the posterior uncertainty and the certificate matrix, which is a new contribution of the paper. It explains the empirical findings of the present paper and, as we hope, adds to a better understanding of semidefinite relaxations in robotics, where characterizing uncertainty has been of paramount importance since the early days. 
+\end{response}
+
+\subsection*{General concerns}
+
+When considering a relaxation as tight or not, and while I agree that the rank or some similar measure (SVR) is usually used and seen in the literature, providing the dual gap between the dual optimal cost and the cost attained by the closest primal feasible solution is a better idea, specially if the problem uses a relaxation (for example from $\mbox{SO}(3)$ to $\mbox{O}(3)$). You will still need a threshold, for example 1e-09 to 1e-10 are common, and I suggest some sort of normalization (e.g,, division of the cost by the number of points/data) to avoid the bias towards problems with many observations. 
+\begin{response}
+    We thank the reviewer for their suggestion and have rerun our experiments to determine and assess the duality gap. We have included an additional figure in Appendix~\ref{App:otherMetrics} that shows a comparison between the ER and the following duality metric, which we feel is adequately normalized:
+    \begin{equation*}
+        \mbox{gap} = \frac{p(\bm{x}_r)-d^*}{1+d^*},
+    \end{equation*}
+    where $p(\bm{x}_r)$ represents the primal cost of the closest feasible, rank-1 solution (rounded solution) and $d^*$ represents the optimal SDP cost (equivalently, the dual cost). The one in the denominator keeps the metric stable when $d^*$ is low. 
+    
+    We believe that the eigenvalue ratio (ER) provides the most succinct assessment of whether a rank-1 solution can be extracted from the SDP solution and, as such, have used it in the main body of the manuscript. 
+
+    Indeed, the duality gap assesses a weaker form of tightness than the rank of the optimal solution: a relaxation may have a (numerically) zero duality gap but still lead exhibit higher-than-rank-one solutions. Since we are interested in extracting the optimal solution from SDP solutions, we need the SDP solution to be of rank one and we are therefore interested in the ER more than the duality gap.
+
+\end{response}
+
+Last, the threshold for tight solutions changes through the evaluation from $10^6$ to $10^7$. 
+
+\begin{response}
+    We have changed the threshold for all problems to $1\times10^6$.
+\end{response}
+
+From the captions of fig.2-8, I understand that 10 to 30 random problem instances were created and are used to show the result. Even for large-scale problems, these are not statistically significant numbers. Before Section IV, the authors indicate that the problem sizes are ``small'' (which is understandable due to the number of variables and constraints), but this does not preclude the execution of more trials to have a more meaningful notion of the performance of the proposal.  
+\begin{response}
+    We agree that this number of trials are not statistically significant and have increased the number of trials to 100 for many of the simulated problems. The exceptions are the experiments that have been moved to the appendix and the simulated results for SLAM which we are still in the process of rerunning (see comment in the Authors' Note).
+\end{response}
+
+I would like to see, side by side, the effect of introducing redundant constraints for problem instances with the same set of parameters.
+\begin{response}
+    In figures where this is relevant, we now show the results both with and without redundant constraints. In some cases, the addition of redundant constraints increased the tightness boundary to outside of the scope of the parameters that were studied. In these cases, we did not include boundary plots (since they would be blank), but have made this clear in the captions and main text. 
+\end{response}
+
+If for the SLAM variation the noise for which the tightness breaks is small, a log-scale of noise / degeneracy of W will be appreciated. 
+\begin{response}
+    The authors are unclear of what is meant by this phrase and would ask that the reviewer please clarify. We did not investigate the level of noise at which the SLAM problem would become tight since it is far below those found in practice, as demonstrated by Figure~\ref{fig:d3_slam_box}.
+
+    Regarding the plot of degeneracy of W vs. noise, we note that since W is exactly the inverse covariance, its conditioning number is equal to the conditioning number of the covariance, which is in turn equal to anistropicity. The tightness depends on both degeneracy of W and noise level as is shown throughout the Figures in the experimental section. 
+\end{response}
+
+Footnotes 8 and 9 contradict each other and I don’t agree with the information in footnote 8. Your SDPs also use the vectorized form. Please, elaborate on both aspects.
+\begin{response}
+    We agree with the reviewer that these footnotes are confusing and have removed both. We also note that both of these footnotes were not adding anything crucial to the understanding manuscript.
+    % RATIONALE:
+    %F8 was based on a discussion with an expert in the field (dave rosen) in which he described that the vectorized version leads to a much larger SDP (many more variables), but with the same number of constraints. In some sense this means that the problem becomes more relaxed, but this is not rigourous so we should remove F8. 
+    % F9 can be removed because it does not add anything: we performed the analysis using vectorized form initially because we initially thought it would be easier to analyze the rank, but this is also not true.</span>
+\end{response}
+
+Whereas I agree that the determinant constraint for 3D rotations can be expressed by a cubic constraints, it was shown in [A] and used since then by various works in the literature, most of them cited in the manuscript, that this constraint can be expressed as quadratic expressions, which are written in the paper in eq(21 a,b) without further information about them. 
+\begin{response}
+    We agree with the reviewer and thank them for providing this insight. We have added one of the `handedness' constraint to the original formulation of the QCQP to enforce membership of the rotations in $\mbox{SO}(3)$, as per~\cite{tronInclusionDeterminantConstraints}. The other handedness constraints (to which the reviewer refers) are, indeed, redundant and are treated as such in our analysis. We also make it clear in the manuscript that other authors have found these (redundant) constraints useful when tightening relaxations. 
+\end{response}
+
+Indicate the number of variables and constraints of the problems you're formulating so that the readers have a better understanding on why you can only tackle `small' problems. Here, the term `small' should be also explicitly indicated, is it 10? 30? 
+\begin{response}
+We agree that a count of our constraints and variables is important. The number of constraints changes with the number of poses and measurements for the SLAM problem, so we have included numbers for the example problems that we consider in Section~\ref{sec:SimStereoSLAM}. We also include these numbers for the Wahba's problem case.
+\end{response}
+
+In figure 6, does the problem remain tight for noiseless data without redundant constraints? 
+\begin{response}
+Without noise, the SLAM problem becomes equivalent to the isotropic case, which has been shown to be tight for low noise levels without redundant constraints. 
+\end{response}
+
+The statement  ``the introduction of matrix weights could lead to a cost function landscape that is less smooth, potentially resulting in more local minima'' in page 1-2 is confusing as smoothness does not imply nonconvexity, for example, L-1 norm. 
+\begin{response}
+We agree that the use of the word `smooth' may be misleading and have changed the phrase accordingly. We posit that the introduction of these weights could potentially lead to more local minima.
+\end{response}
+
+Why do you use isotropic noise for the relative pose but anisotropic for the landmarks? 
+\begin{response}
+We choose not to use anisotropic noise in relative poses for the simplicity of the analysis and because it is less common to see significant anisotropic noise in relative pose measurements (say, from IMU) than it is from a stereo camera model, which is our main motivation. 
+\end{response}
+
+\subsection*{Minor comments}
+
+Eq(9) does not come with an explanation, and I assume the vectorization is column-wise.
+Similarly, the symbol $succeq$ is not defined as PSD in the notation part.  
+\begin{response}
+    We have added a clarification about vectorization order and the $\succeq$ notation to the Notation section.
+\end{response}
+
+Please, number all the equations so that they can be referred to without doubt in the future
+\begin{response}
+    While this may be helpful for reviewer's reference, we believe that it is common practice only to enumerate equations that are important or specifically referred to in the manuscript.
+\end{response}
+
+In prob.(19), there is no explicit link between the membership of C in O(3) and the relation $C^T C = I$. This information should be at least mentioned in the text.
+\begin{response}
+    We agree with the reviewer. The manuscript has been changed to explain how the constraints guarantee membership in $\mbox{SO}(3)$ (see just below \eqref{opt:Localize}).
+\end{response}
+
+In general, the caption of all the images are too long 
+\begin{response}
+    We have attempted to shorten the captions of the images. However, it is our opinion that the figures should be understandable even without the main text. As such, some of the captions need to be longer.
+\end{response} 
+
+On page 8, when you introduce the weight matrices for line and plane primitives as $W=I-nn^T$ and $W=nn^T$, the meaning of n is not introduced anywhere. 
+\begin{response}
+    We have removed these equations since they were not essential to the main discussion. It is only important that the effective weight matrices are degenerate in the paper to which we were referring.
+\end{response}
+
+I suggest the authors avoid terms such as `straightforward', `easy', `clear(ly)' as the associated algebraic manipulation/concept may not seem as such for the readers while they don't add information about the procedure. Referring to previous works and/or Appendix/supplementary material is a better option. 
+\begin{response}
+    We have avoided the use of these terms and changed the wording where required.
+\end{response}
+
+I assume fig 7 shows the results for Wahba. Please, add this information into the caption.
+\begin{response}
+    The problem addressed in Figure 7 (now Figure~\ref{fig:stereo_angle}) is localization with relative pose measurements (not Wahba's problem). This is already stated in the caption.
+\end{response}
+
+The index terms should also capture the Wahba's or localization problem and the anisotropic weights of the observations.
+\begin{response}
+    We have added additional index terms according to the suggestion of the reviewer.
+\end{response}
+
+When you define Wij in page 4, sec.2, it should be noted that the noise is isotropic, the kronecker product comes from the vectorization which later disappears when you re-write the problem as the sum of norms.
+\begin{response}
+    We have added a footnote that highlights the fact that we are using isotropic noise here.
+\end{response}
+
+The related work section does not have its own section and appears as the only subsection 
+\begin{response}
+    The related work now has its own section.
+\end{response}
+
+In Sec I Footnote 6: `This is subject to the usual requirement of constraint qualification' Which one?
+\begin{response}
+    The text to which this footnote refers has been removed, but we nominally ensure that LICQ holds.
+\end{response} 
+
+The last paragraph of the conclusions hints at methods that determine whether or not strong duality holds for a specific problem instance. Ref [13,27,35] do it. Please, elaborate. 
+\begin{response}
+    In this context, we were referring to a more general method to determine if strong duality holds for a given QCQP. It is our understanding that these references show strong duality holds a priori in very specific contexts (e.g. rotational averaging). 
+    
+    In any case, we have removed this paragraph from the conclusion and replaced it with an alternate direction of future work.
+\end{response}
+
+\subsection*{Section II}
+This section is too extensive and some concepts are not used in the work, for example, eq(3) is not referred to and a more general form for eq(2) is shown later in eq(8). 
+\begin{response}
+    Eq(3) was meant to introduce the general form of the cost functions we consider. We have changed this section of the background to link it back to MAP estimation more clearly, since this is important for our new analysis.
+    
+    Eq(8) has been replaced with a reference to eq(2). 
+    
+    Regarding the comment on this section being too extensive, we have reformulated the section extensively to make certain parts more succinct. We feel that the current set of topics that are introduced in the background are essential to the understanding of the manuscript.
+\end{response}
+
+When you say `showing that strong duality holds at a given solution' is misleading. The certification of the solution, under the assumption that strong duality holds, confirms the assumption, in that order. Also, the concept of strong duality is important for the paper and should be introduced. 
+
+Add, at least as an Appendix, how the dual problem is derived, as the phrase after (14) is not direct. The relation between prob.(15) and (14) is also not direct, nor the relation between (15) and the QCQP.  Deriving problem (15) directly from the QCQP by removing the rank-1 constraint will simplify the explanation about the rank and tightness.
+
+\begin{response}
+    We agree that the phrase ``showing that strong duality holds at a given solution'' may be misleading, although we argue that `showing that strong duality holds' for the original problem is the same as showing that the convex relaxation is tight. Accordingly, we have reformulated this phrase.
+
+    Based on the reviewer's suggestions we have rephrased much of this section to focus on the rank relaxation and subsequently define the dual problem. We disagree that the dual problem needs to be derived even in an Appendix, as it has been shown numerous times in the literature. Instead, we provide a reference for the interested reader.
+\end{response}
+
+Last paragraph on page 4 is confusing. The rank-1 condition and its relation with tightness have been shown by many works prior to[19]. Please, elaborate. 
+\begin{response}
+    This paragraph has been removed, due to the rephrasing mentioned above. However, note that we originally mentioned reference [19] ``among others'' and certainly do not claim that it was the first to show this idea.
+\end{response}
+
+The second option in page 5, left column is misleading, as it implies the certification also estimates the global solution, but it only certifies a given solution. 
+The first-order optimality conditions have not been introduced, nor why it is necessary for H to be PSD. 
+In addition, the certification based on the SDP has not been introduced either. Does it solve the whole problem or the modification that includes the primal solution? 
+
+\begin{response}
+    We have shortened this section considerably since the detail we had originally provided was unnecessary. We feel the revised version now coincides with the reviewers viewpoint and obviates the need to introduce the topics mentioned.
+\end{response}
+
+As the authors are aware, the Burar-Monteiro and the Riemannian staircase require some conditions on the problem to use the certifier for each ‘stair’. A positive certification on one of these stairs stops the algorithm, thus making it necessary and not `often'. Further, the approach cannot be considered as `default' as the certifier may not exist and/or it is not possible to find a suitable domain for the ‘stairs’ and thus running this step may be too complicated and not worthy, for example, rotations (not orthogonal matrices). This specific approach is limited to a (wide) range of problems, but it’s far from the default.  
+\begin{response}
+    We agree and have rephrased as follows: ``State-of-the-art methods leverage low-rank SDP techniques such as that of Burer and Monteiro (BM) [16] and
+    the Riemannian Staircase [9], [54] to solve larger problem
+    instances in real time. However, these methods are far less performant when redundant constraints are introduced to tighten the semidefinite
+    relaxation\ldots''
+\end{response}
+
+The paragraph starting with ‘Additionally, if it is known a priori (...)’ Page 5, left column does not seem to provide useful information in this context.  
+\begin{response}
+    We agree with the reviewer and have removed this paragraph.
+\end{response}
+
+ Which ‘technical assumption’ precludes the use of the Burer-Monteiro approach with redundant constraints?. Also, If I cannot use this approach, can I still leverage a certifier (option 2 in page 5, left column) for certification? 
+\begin{response}
+The technical assumption to which we were referring was the satisfaction of LICQ, which would not hold in the BM approach at low rank (for example, at the first `stair' of the Riemannian Staircase). However, we have recently seen another paper that relaxes this assumption \cite{boumalDeterministicGuaranteesBurerMonteiro2020a}.
+
+As such, we acknowledge that there is no preclusion per se and have modified the statement to which the reviewer refers. The BM approach does require a `certification' step, in which the second-order optimality conditions are verified. However, this assumes that one has the optimal Lagrange multipliers in hand. When redundant constraints are used, finding these optimal Lagrange multipliers amounts to solving a version of the dual SDP, albeit with fewer dual variables, which can be as slow as solving the original SDP directly. To answer the second question, the same issue appears when using a certifier.
+
+In the revised manuscript, we have clearly stated this issue as a motivation for studying when redundant constraints are required. 
+
+%Furthermore, the theoretical guarantees for the Riemannian staircase to terminate after few steps require a level of smoothness that is not always trivial to verify and presumably not satisfied by all problems of interest in robotics.
+
+
+\end{response}
+
+Instead of solutions obtained by local methods, I would expand it to any solution (in general) as any solver can be leveraged for this (or even random, feasible solutions). 
+\begin{response}
+We have removed `local', although it is often the case that the fastest solvers (which are desirable for robotic applications) are local solvers.  
+\end{response}
+
+About eq.(11), to the best of my knowledge, all the references also have quadratic cost. Please, elaborate on this.
+\begin{response}
+    To clarify, we were not implying that the other references did not have a quadratic cost, but rather that this choice of cost was quadratic for \emph{our} choice of variables. We have changed the `but' to an `and' to hopefully avoid further confusion on this point. 
+\end{response}
+
+The first option in page 5, left column, should also include the dual problem (eq 14) as a primal solution can be recovered from H, although it is more complex and it depends on some conditions on the problem instance, ref[11] does this. 
+\begin{response}
+    The first option now clearly states that we can either solve the primal or the dual with a footnote that explains that this is what CartanSync does (ref[11]).
+\end{response}
+
+\subsection*{ Section III }
+\subsubsection*{A} 
+If you keep sec. II, it will be helpful to relate prob(15) with the general one in (3). 
+\begin{response}
+    We agree with the reviewer that this connection would be helpful. However, we instead make the connection to general QCQP, Problem \ref{opt:QCQP}, rather than connect \eqref{eqn:factor_graph} directly to the relaxed form:
+
+    ``Note that any problem with quadratic cost and constraints can be converted into a problem of this form \cite{cifuentesLocalStabilitySemidefinite2022}. \rev{This includes with cost function of the form given in \eqref{eqn:factor_graph}, as long as the error terms are \emph{linear} in the optimization variables and the constraints are quadratic.}''
+
+    The specific problem reformulation here depends on the form of the error terms, making a general reformulation difficult.
+
+\end{response}
+
+The development of the cost function, and also for the cost in section B, can be moved to an Appendix, as it has been done in the literature for the generalized registration problem.  I would also add the relation between your specific case and the SOTA. This would also motivate the use of redundant constraints, specially when the anisotropicity increases. What is the reason for writing the vector z in eq.(18) with all the variables if the problems are independent? Also, the separability of this problem is really important, as it allows us to solve N problems instead of  a fully dense one. If this statement does not hold for stereo, as in the experiments in section IV, indicate this explicitly as an exception. 
+\begin{response}
+    We have reworked the Formulation section based on the reviewer's comments. We have moved the main computations of the cost functions into the Appendix and highlighted the importance of the separability property. We have also removed localization with relative pose measurements. The explicit use of $\bm{z}$ was meant to represent the most general form of the problem (non-separable) and to lead into the next section. However, the stereo version of Wahba's problem does enjoy separability.
+\end{response}
+
+\subsubsection*{B}
+In eq.21, please, refer to the previous works where these sets were introduced and used [A]. 
+\begin{response} 
+    We have reformulated the primal problems to include the constraints from [A] and clarified the use of the redundant constraints in other papers.  
+\end{response}
+
+The wording `fast solver' is misleading. You can actually use local methods even for redundant constraints, as you're not solving the SDP but the primal problem. What you cannot use are the fast (closed-form) certifiers and the tools to solve the SDP from scratch become slow as well. 
+\begin{response}
+We agree with the reviewer and refrain from using `fast solver'. 
+\end{response}
+
+When you say ‘in some problem instances, the level of noise can break the tightness’ to which relaxation you’re referring to: localization or PGO? 
+\begin{response}
+This phrase was removed in the course of developing the new manuscript.
+\end{response}
+
+\subsubsection*{C}
+Is the first equation relevant in this context?
+\begin{response}
+This equation was not immediately relevant and, as such, has been removed in the revised manuscript.
+\end{response}
+
+When you say that you empirically discover a small subset of constraints, is the set independent of noise, poses, (variables in general) and number of data/observations? 
+\begin{response}
+We cannot claim that the constraint set is entirely independent of noise, poses and number of observations, but for the problems that we have investigated, these constraints are sufficient. 
+Indeed, the fact that the relaxations are tight after adding the proposed redundant constraints, provides an a-posteriori guarantee that we have found enough constraints
+As the use of redundant constraints is still an active area of research, we cannot (yet) theoretically prove a priori that constraints will tighten the problem regardless of the problem parameters. However, the concept of SDP stability~\cite{cifuentesLocalStabilitySemidefinite2022} allows us to say that similar problems to those that we study will also be tight. In addition, the constraints are defined with respect to poses and observations and will change as the number of poses and observations change. We have added a comment to this effect in our new section, Section~\ref{sec:Tightening}.
+\end{response}
+
+Another example when the rank of the solution was larger than one, but the optimal solution was still retrieved successfully was reported in [61]. 
+\begin{response}
+    We thank the reviewer for bringing this to our attention. We believe that this reference constitutes a special case and would also like to point out that Theorem 4.3 therein still requires that parts of the solution (submatrices) be rank-1 for global optimality to be claimed.
+\end{response}
+
+When you say ‘certify or solve the relaxation’ I assume you mean that the last option also allows the extraction of a primal solution. However, the SDP is solved in both cases.
+\begin{response}
+    This is exactly correct. When redundant constraints are used, both certification (via the dual SDP) and solving the primal SDP directly involve solving an SDP.
+\end{response}  
+
+\subsection*{Experiments}
+
+The terms ‘localization’ and ‘Wahba’ are used interchangeably yet for degenerate weight matrices, your problem is closer to the registration formulation (point-line and point-plane, as the authors mention). 
+\begin{response}
+    In the previous manuscript, we have referred to single-pose localization as (extended) Wahba's problem. In the current manuscript, we have replaced all instances of `single-pose localization' with `Wahba's problem'. We have added the following footnote where this problem is introduced: ``In the sequel, we will refer to single-pose instances of Problem~\ref{opt:Localize} as Wahba's problem, though it is also known as registration or single-pose localization.''
+\end{response}
+
+In fig. 2 and 3, are the Y and X axes showing the same noise (amount of noise vs anisotropicity)? 
+\begin{response}
+    Yes, as mentioned in the text, the Y axis shows the level of noise (corresponding to the size of the uncertainty ellipsoid) while the X axis shows the anisotropicity (corresponding to the shape of the ellipsoid).
+\end{response}
+
+I notice the problem derived in Sec. III.B is not evaluated in section IV. Is this problem used in the manuscript at any point? 
+\begin{response}
+    This problem was evaluated in Figure 5 of the original manuscript. However, we have now shifted the focus of the paper away from this problem and this problem, along with Figure 5, have been removed. The problem was an intermediate problem between Wahba's problem and the SLAM formulation, and not sufficiently distinct from both to justify keeping an in-depth treatment thereof.
+\end{response}
+
+The caption of fig. 2 and the text where it is referred to say different things.  
+\begin{response}
+The number of trials in the text was originally incorrect. However, we have since changed both the figure and the main text to reflect the current results. 
+\end{response}
+
+The size of the bounding cube and the distance from camera frame seem  to have a default values, please specify them. How are the stereo measurements introduced into the formulation?
+\begin{response}
+    We have added the following sentence to the general simulation description in Section~\ref{sec:Simulations}: ``Unless otherwise specified, the default values for distance and bounding cube length are 3 m and 1 m, respectively.''
+\end{response}
+
+Please, indicate if the STD in the graphics is the noise or its another STD. 
+\begin{response}
+    The STD acronym was introduced in the text and stands for standard deviation. We have added ``standard deviation of the noise'' at this point in the text to make it clear. 
+\end{response}
+
+In fig 3b, which is the reason behind the peak at 10 of anisotro.? 
+\begin{response}
+    We have added an explanation of this phenomenon, which can be found in Section~\ref{sec:SimMisalign}. In brief, we have now drawn the connection between posterior uncertainty and tightness and, in this case, posterior uncertainty depends partially on the minor axis of the uncertainty ellipsoid (which decreases as anistropicity increases).
+\end{response}
+
+I think I may have misunderstood the configuration for this setup, but are all the observations being moved towards the center of the bounding box?  
+\begin{response}
+    We have added clarification on this point. The points are always drawn from a uniform distribution inside the bounding cube and in this case we change the size of the bounding cube. Increasing the size (hence the landmark spread) improves the tightness boundary.
+\end{response}
+
+For the situations in fig. 2 and 3, which was the behavior of the proposal with redundant constraints? The stereo experiments show in fig. 4 do include this set. 
+\begin{response}
+    On the recommendation of the reviewer, we have added plots that demonstrate the behaviour with redundant constraints. In general, the redundant constraints push the tightness boundary outside of the parameter ranges of consideration. In these case, we do not show the plots, but make it clear in the text and figure captions that this is the case.
+\end{response}
+
+Where is the tight zone in fig 4 (I suppose that above the graphics)?  
+\begin{response}
+    We thank the reviewer for pointing this out and have added labels to the graphic.
+\end{response}
+
+The simulated experiments for SLAM (fig. 6) don’t have any specific subsection, yet it’s one of your main problems.
+\begin{response}
+    We have added a specific subsection for stereo SLAM. See Section~\ref{sec:SimStereoSLAM}
+\end{response}
+
+For fig.7, did you also consider poses with less observations that the minimum required to solve the problem uniquely?  
+\begin{response}
+    In this case, relative-pose measurements are also used between the poses. As such, the number of landmark measurements can be below the required number of points (3), but we can still have a tight relaxation. Note that this Figure has now been moved to the Appendix.
+\end{response}
+
+How is the matrix-weight generated for fig. 8? 
+\begin{response}
+    A description of the matrix-weights for both stereo-landmark measurements and relative-pose measurements is given in Section~\ref{sec:Background} and the referred sections of the Appendix. We added a sentence to clarify this in Section~\ref{sec:stereoslam_starry}.
+\end{response}
+
+How is the relation between the distance to landmark and anisotropic metric for the stereo experiments (about fig. 4)? 
+\begin{response}
+    We now make a note of this connection in Section~\ref{sec:SimWahbaStereo}, which refers to Appendix~\ref{App:stereo}. Therein, we mention that anisotropicity is proportional to $\frac{\hat{z}_c}{b}$ where $\hat{z}_c$ is effectively the distance to the landmarks.
+\end{response}
+
+It would be important to see if this figure is adding more information about the performance of the solver or if it's redundant with fig. 2 and 3.
+\begin{response}
+    It is the authors' opinion that it is important to also demonstrate the behaviour on a model that actually represents the sensor that will be used on a given robot, rather than the idealized results. Moreover, the uncertainty of the measurements in this figure depend on distance from the pose, whereas in figures 2 and 3 of the original manuscript, the uncertainty was completely controlled.
+\end{response}
+
+ Also, does a random covariance, not necessarily degenerate, change the behavior of the solvers? 
+\begin{response}
+    We would like to clarify that the covariances that we deal with are not degenerate since they are strictly positive definite, though it is true that they approach degeneracy as anisotropicity goes to infinity. We did not study `random covariances', but imagine it would be similar to the randomly misaligned covariances in Section~\ref{sec:SimMisalign}. 
+\end{response}
+Ref [A]: “On the inclusion of determinant constraints in lagrangian duality for 3D SLAM”, R Tron, D.M Rosen, L .Carlone
+
+\section*{Response to Reviewer 7's Comments}
+
+\subsection*{Summary and Overall evaluation}
+
+I think this paper presents a set of theoretical and empirical results that demonstrate an interesting observation when using  semidefinite relaxations for state estimation problems in robotics. The paper is well organized and well written, so I would like to see this paper accepted.
+
+\begin{response}
+We thank the reviewer for their concise and positive evaluation of our work. 
+\end{response}
+
+\subsection*{Weaknesses}
+In the mean while, I feel the practical contribution of this paper is minor. For example, this paper does not contribute an algorithm. The authors do mention an algorithm that can automatically search for redundant constraints, but that algorithm is presented in another preprint of the authors. 
+\begin{response}
+We agree with the reviewer that much could be done to improve the practical contribution of the original paper. As such, we have since added two key sections that improve on this aspect:
+\begin{itemize}
+    \item Section~\ref{sec:Uncertainty} provides new intuition by connecting the classical notion of posterior uncertainty to the dual or certificate matrix of the SDP relaxation and, by extension, tightness of the relaxation. Though this section is theoretical in nature, we believe that it has real practical implications. For instance, it allows to derive covariance of the posterior estimate directly from the SDP solution.
+    \item Section~\ref{sec:OutdoorLoc} now shows that our SDP approach for matrix-weighted Wahba's Problem can be used in a stereo-localization pipeline. In this sense, we show how our method can fit into a practical robotics algorithm/pipeline. Further, this experiment shows that our method achieves near realtime performance.
+\end{itemize}
+\end{response}
+
+\subsection*{Minor comments}
+In equation (3), the summation over the set of relative pose measurements should use index (i,j) instead of (i,k).
+\begin{response}
+    We thank the reviewer for pointing this out and have changed the notation accordingly.
+\end{response}
+
+In Section III, the three types of problems correspond to Section III.A,B,C, respectively. But in Section IV and V, the names of the subsections do not seem to match the names of the three problems. Is it possible for the experiments to be arranged in the same way as the problem formulations are introduced? In this way it may be easier for the readers to match problem formulations with experimental results. 
+\begin{response}
+    We agree that the previous structure was confusing. We have changed the structure of Sections~\ref{sec:Simulations} and~\ref{sec:RealExp} according to this suggestion by the reviewer.
+\end{response}
+
+\section*{Response to Reviewer 9's Comments}
+
+Overall, I find the paper well written. The text is clear and despite the complexity of the problem, avoids death by notation. The analyzed problem is timely and interesting to the robotics community. I would like to congratulate the authors on their fine work. Nevertheless, in reviewer's opinion the paper does have some shortcomings and here are the comments that might further improve the paper. 
+
+\begin{response}
+We thank the reviewer for their appreciation of our work. We agree that there were some shortcomings in the initial draft of the paper. 
+\end{response}
+
+\subsection*{Major comments}
+
+In reviewers opinion the experiments are interesting, but not sufficient. The methods are mature enough at this point and to warrant publication in TRO, a realistic outside the lab experiments should be included. The Starry Nights dataset is interesting and contributes to the community, but at this point it represent experiments at the laboratory level, since the stereo camera baseline-to-depth ratio is 7.3, while in reality it is expected to be between 20 and 40. Outdoor datasets  with good ground truth are available nowadays, and the community could see how the proposed method behaves in a realistic case. 
+
+\begin{response}
+    We thank the reviewer for this recommendation. In response, we have used our approach for matrix-weighted Wahba's problem in a stereo-localization pipeline and applied it to a real-world, outdoor dataset. The results for this experiment are shown in Section~\ref{sec:OutdoorLoc}. 
+\end{response}
+
+If the goal was to determine the threshold where no redundant constraints are needed and low-rank methods can be used to solve problems, is it even possible to realistically avoid redundant constraints even for the examples in the experiments? Given a realistic experiment (w.r.t. to previous comment), is it possible with current state-of-the-art to use certifiable methods in such localization and landmark-based SLAM scenarios? This was the main motivation of the paper as stated in the last paragraph before Section III and the question is if the paper in its current form answers this problem clearly. To help with this problem, authors could draft recommendations for finding these 'thresholds' for a given localization problem and comment on the aspects that could be encountered in practice. 
+
+\begin{response}
+    We have shifted the focus of our motivation away from finding these thresholds and replaced the phrase referred to by the reviewer as follows:
+    ``\ldots, a key goal of this paper is to establish whether SDP relaxations of problems with matrix weights necessitate redundant constraints and, if so, whether it is possible to find global solutions efficiently enough for robotics applications.''
+    
+    In the revised manuscript we note that redundant constraints are always required to attain robustness to practical levels of noise in the problems that we study. We also note that, with the current state-of-the-art Wahba's problem can still run quite fast even with redundant constraints and we show that it can be integrated into a robotics pipeline. 
+    
+    We thank the reviewer for the prudent suggestion to add recommendations. 
+    In our conclusion, we recommend the use redundant constraints for Wahba's problem, but make it clear that the stereo SLAM problem becomes intractable with the redundant constraints. 
+
+\end{response}
+
+Furthermore, how would the certifiable localization and SLAM compare to 'classical methods' with reasonably good initialization? Is it truly necessary to run certifiable methods, when perhaps localization is not that safety-critical? How much does global optimality matter w.r.t. to local methods? This is briefly commented in footnote 14, but should be more systematically analyzed in the paper. The paper and community would benefit from such answers.
+\begin{response}
+    In the new experiment section, Section~\ref{sec:OutdoorLoc}, we highlight the fact that the equivalent local optimization sometimes converges to egregious local minima, even when initialized via standard methods (i.e. the estimate from RANSAC). On the other hand, our approach always provides the globally optimal estimate.
+\end{response}
+
+Current paper's contributions w.r.t. to authors previous work is not sufficiently addressed in the current paper. Authors do mention that landmark based SLAM with scalar weights was already presented in [31], where a minimum set of redundant  constraints was automatically discovered. Additionally,  concurrent work in [24] uses same formalism as the current paper. Differences w.r.t. to these two papers should clearly be stated and argued at the introduction level. 
+\begin{response}
+    We have added a contributions section to Section \ref{sec:RelatedContrib}, which outlines the results we present in this paper. In particular, we highlight the fact that our concurrent paper ([24]) finds redundant constraints \emph{numerically} for a specific problem, but additional work is still required to interpret these numerical constraints as equations that can be applied to a given problem in general (rather than a specific instance of a problem). We also contrast our approach to that of [24] in a new section that is dedicated explaining our approach to tightening the relaxations, Section~\ref{sec:Tightening}.
+    
+    We would like to clarify that our previous paper ([24]) did not require the use of any redundant constraints and only the standard constraints associated with $\mbox{O}(3)$ were used. In this previous paper, the problem was \emph{already} tight up to a high noise level without redundant constraints.
+\end{response}
+
+Given that the paper is searching for thresholds when redundant constraints are not needed, in reviewer's opinion, the paper should avoid/reduce using qualitative 'low enough' for the noise levels. This opens the question of how low is then low enough? And if truly the found levels of noise for the 
+considered problem are practical? 
+\begin{response}
+    We thank the reviewer for this valuable suggestion and have attempted to curtail our use of such phrases. As mentioned above, we have moved the focus of the paper away from determining the threshold at which redundant constraints are not necessary.
+\end{response}
+
+In Sec. III.B, it is stated that the problem is no longer separable meaning that solving SDP relaxation becomes slower for reasonably sized problems, does that mean that even in this case it is not possible to solve the problem with 'faster' methods prior to introducing the redundant constraints? 
+\begin{response}
+    We state that the lack of separability makes ``\emph{directly} solving the SDP'' much slower for reasonable problems. However, if there are no redundant constraints, then it is not necessary to directly solve the SDP and the faster methods can be applied. The coupling between subproblems may increase runtime of the faster methods, but certainly not to the same extent as directly solving the relaxation.
+\end{response}
+
+In Sec. III.C it is clearly stated that additional redundant constraints must be used since even for small noise levels this problem is not tight and 'slower' methods must be used. It would be beneficial if this was clear in both cases - is the redundancy necessary due to technical reasons or because of the tightness (since it is lost even for very low noise levels)?
+\begin{response}
+    The function of the redundant constraints is always to make the relaxation tighter and this is the only reason that they are introduced. When the redundant constraints are used, the slower methods (i.e., solving the SDP directly) must also be used. We hope that this point has been clarified by our reformulation of the Background section and our addition of a section that explains our approach to tightening relaxations, Section \ref{sec:Tightening}.
+\end{response}
+
+\subsection*{Minor comments}
+
+If I understood correctly, Sec. IV-a does not introduce redundant constraints (21) and looks for the boundary where the problems is still tight w.r.t. to varying noise and anisotropicity levels? This should repeated in all the experimental sections so that it is clear from the start. 
+\begin{response}
+    We now consistently show the simulated experiments both with and without redundant constraints to make this point clearer, with the exception of figures for which the introduction of redundant constraints causes all cases to be tight (there would be no boundary to show) or the SLAM case in which no case is tight without redundant constraints.
+\end{response}
+
+In Sec II.B.1 it is assumed that $\sigma_{ij}$ are the same for all rotational degrees of freedom. Is this necessary, or the uncertainty can be different along the 3DOF? E.g., pitch could have smaller uncertainty than yaw (although I understand that these factors do not necessarily represent Euler angles)?  
+\begin{response}
+    Theoretically, it is possible to have different values for the $\sigma_{ij}$, but we did not study this case since, as mentioned by the reviewer, it would be difficult to interpret the meaning of such a noise distribution. We have added the following footnote: ``Note that these weights represent isotropic noise, although representing other distributions may be possible.''
+\end{response}
+Would it make more sense to have $t_{ji}^i$ instead of the other way around? Since rotations are defined as heaving relative frames in the subscript? Is there any advantage to this notation?  
+\begin{response}
+    We have selected this particular notation to be consistent with the conventions in our previous work. However, please note that we have simplified the definition of $t_{ji}^i$ to $t_i$ in much of the manuscript.
+\end{response}
+
+In simulation scenarios it is not clear which baseline was used for the stereo camera.
+\begin{response}
+    We have added Table~\ref{tbl:cam_params} with the stereo parameters that were used for these experiments.
+\end{response}
+
+Notation $<.,.>$ should be defined after (15)
+\begin{response}
+We have added this notation to the Notation section.
+\end{response}
+
+\endgroup
+
+\newpage
+\setcounter{page}{1} 
+\setcounter{section}{0}
+\twocolumn
