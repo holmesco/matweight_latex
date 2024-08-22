@@ -1,5 +1,5 @@
 \documentclass[lettersize,journal]{IEEEtran}
-\usepackage{amsmath,amsfonts,amsthm,amsbsy}
+\usepackage{amsmath,amsfonts,amsthm,amsbsy, amssymb}
 \usepackage{algorithmic}
 \usepackage{algorithm}
 \usepackage{array}
@@ -155,7 +155,7 @@ Though SE-Sync and its derivatives are among the most performant algorithms in c
 
 This `tightening trick' has been known for some time in the optimization community~\cite{nesterovSemidefiniteProgrammingRelaxations2000}, and has been applied to several problems~\cite{ruizUsingRedundancyStrengthen2011, parriloSemidefiniteProgrammingRelaxations2003a}. In the computer-vision community, redundant constraints have been used to tighten generalized essential-matrix estimation~\cite{zhaoCertifiablyGloballyOptimal2020}, relative-pose estimation between cameras~\cite{garcia-salgueroTighterRelaxationRelative2022, brialesCertifiablyGloballyOptimal2018}, and registration using 3D primitives~\cite{brialesConvexGlobal3D2017}. The formulation given in the latter paper is a degenerate version of our single-pose, matrix-weighted localization formulation (see Section~\ref{sec:Localization}), in which the use of (degenerate) matrix weights is motivated by geometry rather than noise distribution. 
 
-Interestingly, both~\cite{garcia-salgueroTighterRelaxationRelative2022} and~\cite{brialesCertifiablyGloballyOptimal2018} showed that adding redundant constraints increases the level of measurement noise for which their respective problems remain tight. In the context of robotics,~\cite{wiseCertifiablyOptimalMonocular2020} found a similar result when exploring the effect of redundant constraints on a sensor-calibration task.~\cite{yangTEASERFastCertifiable2021} introduced redundant constraints in conjunction with \emph{graduated nonconvexity}~\cite{yangGraduatedNonConvexityRobust2020} to solve \emph{robust} point-set registration globally.~\cite{yangOneRingRule2020} and~\cite{yangCertifiablyOptimalOutlierRobust2023} extended these results to several other robust perception problems by leveraging the Lasserre-moment hierarchy~\cite{henrionMomentSOSHierarchyLectures2021,lasserreGlobalOptimizationPolynomials2001}. 
+Interestingly, both~\cite{garcia-salgueroTighterRelaxationRelative2022} and~\cite{brialesCertifiablyGloballyOptimal2018} showed that adding redundant constraints increases the level of measurement noise for which their respective problems remain tight. In the context of robotics,~\cite{wiseCertifiablyOptimalMonocular2020} found a similar result when exploring the effect of redundant constraints on a sensor-calibration task.~\cite{yangTEASERFastCertifiable2021} introduced redundant constraints in conjunction with \emph{graduated non-convexity}~\cite{yangGraduatedNonConvexityRobust2020} to solve \emph{robust} point-set registration globally.~\cite{yangOneRingRule2020} and~\cite{yangCertifiablyOptimalOutlierRobust2023} extended these results to several other robust perception problems by leveraging the Lasserre-moment hierarchy~\cite{henrionMomentSOSHierarchyLectures2021,lasserreGlobalOptimizationPolynomials2001}. 
 
 This hierarchy constitutes a powerful set of theoretical tools that are guaranteed to tighten the SDP relaxation of any \emph{polynomial} optimization problem through the use of redundant variables and constraints.\footnote{Note that this class of problems encompasses almost all of the certifiable perception problems to date.} The caveat to this method is that it requires the addition of new variables and constraints -- possibly \emph{ad infinitum} -- and can quickly become intractable in practice. Techniques such as \emph{Douglas-Rachford Splitting} for certification~\cite{yangTEASERFastCertifiable2021} and the STRIDE algorithm~\cite{yangCertifiablyOptimalOutlierRobust2023} have improved runtimes when the moment hierarchy is used, but are still far from real time. 
 
@@ -244,17 +244,17 @@ The exact form of these terms are discussed in the next two sections. Though our
 
 Each edge, $(i,k) \in \EdgeSet_m $, represents a measurement of the $k^{th}$ landmark from the $i^{th}$ pose. In robotics, the sensors that provide measurements of landmarks can often be modeled as
 \begin{equation}
-	\bm{d}_{ik} = \bm{g}(\bm{C}_i\bm{m}_0^{k0} - \bm{t}_i) + \bm{\epsilon}_{d,ik}, \quad \bm{\epsilon}_{d,ik} \in \mathcal{N}(\bm{0},\bm{\Sigma}_{d,ik}),
+	\bm{d}_{ik} = \bm{g}(\bm{C}_i\bm{m}_{0,}^{k0} - \bm{t}_i) + \bm{\epsilon}_{d,ik}, \quad \bm{\epsilon}_{d,ik} \in \mathcal{N}(\bm{0},\bm{\Sigma}_{d,ik}),
 \end{equation}
-where $ \bm{d}_{ik} $ represents the (raw) measurement of landmark $k$ from the $i^{th}$ pose variable, $\bm{m}_0^{k0}$ is the location of landmark $k$ in the global frame, $ \bm{g}(\cdot) $ is an invertible, smooth, nonlinear function, and $ \bm{\epsilon}_{d,ik} $ is a zero-mean error term having normal distribution with associated covariance matrix, $ \bm{\Sigma}_{d,ik} $. 
+where $ \bm{d}_{ik} $ represents the (raw) measurement of landmark $k$ from the $i^{th}$ pose variable, $\bm{m}_{0,}^{k0}$ is the location of landmark $k$ in the global frame, $ \bm{g}(\cdot) $ is an invertible, smooth, non-linear function, and $ \bm{\epsilon}_{d,ik} $ is a zero-mean error term having normal distribution with associated covariance matrix, $ \bm{\Sigma}_{d,ik} $. 
 
-It is often desirable to convert measurements $ \bm{d}_{ik} $ to a more convenient form by inverting the measurement model (if possible) and defining the pseudo-measurement, $\tilde{\bm{m}}_i^{ki} = \bm{g}^{-1}(\bm{d}_{ik})$, with mean given by
+It is often desirable to convert measurements $ \bm{d}_{ik} $ to a more convenient form by inverting the measurement model (if possible) and defining the pseudo-measurement, $\tilde{\bm{m}}_i^{ki} = \bm{g}^{-1}(\bm{d}_{ik})$, with \rev{approximate } mean given by
 \begin{equation*}
-	\mathbb{E}(\tilde{\bm{m}}_i^{ki})=\bm{C}_i\bm{m}_0^{k0} - \bm{t}_i.
+	\mathbb{E}(\tilde{\bm{m}}_i^{ki})~\rev{\approx}~\bm{C}_i\bm{m}_{0,}^{k0} - \bm{t}_i.
 \end{equation*} 
 The deviation from the mean, given by
 \begin{equation}\label{eqn:lm_error_term}
-	\bm{e}_{ik} = \tilde{\bm{m}}_i^{ki} - (\bm{C}_i\bm{m}_0^{k0} - \bm{t}_i),
+	\bm{e}_{ik} = \tilde{\bm{m}}_i^{ki} - (\bm{C}_i\bm{m}_{0,}^{k0} - \bm{t}_i),
 \end{equation}
 is \emph{approximately} Gaussian with zero mean and is exactly the error term for this measurement factor. Regardless of whether $ \bm{\Sigma}_{d,ik} $ represents isotropic noise, the (linearly-transformed) covariance of $\bm{\epsilon}_{ik} $ is typically \textit{anisotropic} and is given by
 \begin{equation}
@@ -291,7 +291,7 @@ We review the well-known procedure for deriving convex, SDP relaxations of a sta
 \end{equation}
 where $ \bm{z}\in\mathbb{R}^n $ is the homogeneous optimization variable, $ \bm{Q}\in\mathbb{R}^{n\times n} $ represents the quadratic cost, the $ \bm{A}_i $ correspond to $ N_c $ quadratic constraints, and $ \bm{A}_0 $ corresponds to the so-called \emph{homogenizing constraint}\cite{cifuentesLocalStabilitySemidefinite2022}. Note that any problem with quadratic cost and constraints can be converted into a problem of this form~\cite{cifuentesLocalStabilitySemidefinite2022}. This includes cost functions of the form given in \eqref{eqn:factor_graph}, as long as the error terms are \emph{linear} in the optimization variables and the constraints are quadratic.
 
-In general, problems with quadratic equality constraints, such as QCQPs, are difficult to solve optimally because they are nonconvex~\cite{boydConvexOptimization2004}. However, a popular approach to obtaining globally optimal solutions to QCQPs involves formulating the convex, SDP  relaxation of the QCQP and subsequently showing that this relaxation is \emph{tight}. In this context, `tight' means that the relaxation and the original problem have the same optimal cost and equivalent minimizers.
+In general, problems with quadratic equality constraints, such as QCQPs, are difficult to solve optimally because they are non-convex~\cite{boydConvexOptimization2004}. However, a popular approach to obtaining globally optimal solutions to QCQPs involves formulating the convex, SDP  relaxation of the QCQP and subsequently showing that this relaxation is \emph{tight}. In this context, `tight' means that the relaxation and the original problem have the same optimal cost and equivalent minimizers.
 
 It can be shown that Problem \eqref{opt:QCQP} is equivalent to the following problem~\cite{cifuentesLocalStabilitySemidefinite2022}:
 \begin{equation}\label{opt:R1SDP}
@@ -329,7 +329,7 @@ Since Problem \eqref{opt:SDP} is convex, it has the same optimal cost as its dua
 
 \rev{The complementary slackness conditions of \eqref{opt:SDP} and its dual, \eqref{opt:Dual}, provide the following relationship between the rank of the primal and dual solution matrices,
 \begin{equation}
-	\mbox{rank}(\bm{Z}^*) \leq=n-\mbox{rank}(\bm{H}^*)=\mbox{corank}(\bm{H}^*),
+	\mbox{rank}(\bm{Z}^*) \leq n-\mbox{rank}(\bm{H}^*)=\mbox{corank}(\bm{H}^*),
 \end{equation}
 where $\bm{H}^*$ represents the dual matrix at the optimal Lagrange multipliers $(\bm{\lambda}^*,\rho^*)$.\footnote{We replace $\bm{H}(\bm{\lambda},\rho)$ with $\bm{H}$ when it is clear from the context.} When \eqref{opt:SDP} satisfies the so-called \emph{strict complementarity} property, this inequality is binding (i.e. an equality). In the sequel, we will make use of this relationship to study the tightness of the relaxation by analyzing the dual matrix, $\bm{H}^*$, which is more directly connected to the problem data.}
 
@@ -358,7 +358,7 @@ The maximum-likelihood estimate of the poses is given by the solution to the fol
 		\min\limits_{\bm{C}_i,\bm{t}_i, \forall  i \in \VertSetP} &\sum\limits_{(i,k)\in\EdgeSet_m} \bm{e}_{ik}^T \bm{W}_{ik} \bm{e}_{ik} \\
 		\mbox{s.t.} &  \bm{C}_i^T \bm{C}_i = \bm{I}, ~\forall i = \VertSetP,\\
 		& (\bm{c}_i^{1})^\times\bm{c}_i^{2} - \bm{c}_i^{3} = \bm{0},~\forall i = \VertSetP, \\
-		\mbox{where} & \bm{e}_{ik} = \tilde{\bm{m}}_i^{ki} - \bm{C}_i\bm{m}_0^{k0} + \bm{t}_i ,
+		\mbox{where} & \bm{e}_{ik} = \tilde{\bm{m}}_i^{ki} - \bm{C}_i\bm{m}_{0,}^{k0} + \bm{t}_i ,
 	\end{array}
 \end{equation}
 where the variable definitions are consistent with those provided in Section~\ref{sec:MeasModels} and $\bm{c}_i^j$ denotes the $j^{th}$ column of matrix $\bm{C}_i$. It has been shown that the two constraints on the $\bm{C}_i$ in \eqref{opt:Localize} are sufficient to ensure that $\bm{C}_i\in\mbox{SO}(3)$ and can be expressed in the standard quadratic form of \eqref{opt:QCQP}~\cite{tronInclusionDeterminantConstraints}. Therefore, this problem is a QCQP since $\bm{e}_{ik}$ is \emph{linear} in $\bm{C}_i$ and $\bm{t}_i$, and the constraints are quadratic. 
@@ -388,13 +388,13 @@ In Appendix~\ref{App:SDPStability}, we prove that the SDP relaxation of Problem 
 
 \subsection{Matrix-Weighted Landmark-based SLAM}\label{sec:SLAM}
 
-In this section, we explore the effect of matrix weighting when the landmark locations, $\bm{m}_0^{k0}$, are not known \emph{a priori}. The resulting problem, known as landmark-based SLAM, is given by,
+In this section, we explore the effect of matrix weighting when the landmark locations, $\bm{m}_{0,}^{k0}$, are not known \emph{a priori}. The resulting problem, known as landmark-based SLAM, is given by,
 
 \begin{equation}
 	\label{opt:landmark_SLAM}
 	\hspace*{-10pt}\begin{array}{rl}
-		\min\limits_{\substack{\bm{C}_i,\bm{t}_i, \bm{m}_0^{k0}\\ \forall i\in \VertSetP,\\ \forall k\in\VertSetM } } &\sum\limits_{(i,k)\in\EdgeSet_m}  \bm{e}_{ik}^T \bm{W}_{ik} \bm{e}_{ik} +\sum\limits_{(i,j)\in\EdgeSet_p}  \bm{e}_{ij}^T \bm{W}_{ij} \bm{e}_{ij}\\
-		\mbox{where} & \bm{e}_{ik} = \tilde{\bm{m}}_i^{ki} - \bm{C}_{i0}\bm{m}_0^{k0} + \bm{t}_i^{i0} , \\
+		\min\limits_{\substack{\bm{C}_i,\bm{t}_i, \bm{m}_{0,}^{k0}\\ \forall i\in \VertSetP,\\ \forall k\in\VertSetM } } &\sum\limits_{(i,k)\in\EdgeSet_m}  \bm{e}_{ik}^T \bm{W}_{ik} \bm{e}_{ik} +\sum\limits_{(i,j)\in\EdgeSet_p}  \bm{e}_{ij}^T \bm{W}_{ij} \bm{e}_{ij}\\
+		\mbox{where} & \bm{e}_{ik} = \tilde{\bm{m}}_i^{ki} - \bm{C}_{i0}\bm{m}_{0,}^{k0} + \bm{t}_i^{i0} , \\
 		&\bm{e}_{ij} = \vect{\tilde{\bm{T}}_{ij}\bm{T}_{j0} - \bm{T}_{i0}}, \\
 		\mbox{s.t.} &\bm{C}_i^T \bm{C}_i = \bm{I},~\forall i \in \VertSetP.\\
 		& (\bm{c}_i^{1})^\times\bm{c}_i^{2} - \bm{c}_i^{3} = \bm{0},~\forall i = \VertSetP,.
@@ -403,11 +403,11 @@ In this section, we explore the effect of matrix weighting when the landmark loc
 Note that the cost of \eqref{opt:landmark_SLAM} includes both landmark measurements and relative-pose measurements.
 In the \emph{scalar-weighted} context, the convex relaxation of an equivalent problem has already been studied and was generally found to be tight for noise levels well above those found in practical robotics scenarios~\cite{holmesEfficientGlobalOptimality2023}. 
 
-On the other hand, when matrix weights are used (i.e., the noise distribution is anisotropic), the landmark-based error term \eqref{eqn:lm_error_term} becomes \emph{quadratic} in the optimization variables (due to the $\bm{C}_i\bm{m}_0^{k0}$ terms) and the cost function of Problem \eqref{opt:landmark_SLAM} becomes \emph{quartic}. In the scalar-weighted case ($\bm{W}_{ik} = w_{ik}\bm{I}$), this issue is obviated by premultiplying the error terms by the inverse pose rotations to regain \emph{linearity} of the error terms. However, preforming this operation in the matrix-weighted case will change the cost function, since $\bm{C}_i^T\bm{W}_{ik}\bm{C}_i\neq \bm{W}_{ik}$ when $\bm{W}_{ik}$ is an arbitrary positive definite matrix.\footnote{This reflects the fact that the measurement noise \emph{has an orientation} and depends on the (unknown) observation frame. This would not be an issue if all measurements were defined in a common frame, but, in practice, measurements are typically taken in the robot's frame of reference.}
+On the other hand, when matrix weights are used (i.e., the noise distribution is anisotropic), the landmark-based error term \eqref{eqn:lm_error_term} becomes \emph{quadratic} in the optimization variables (due to the $\bm{C}_i\bm{m}_{0,}^{k0}$ terms) and the cost function of Problem \eqref{opt:landmark_SLAM} becomes \emph{quartic}. In the scalar-weighted case ($\bm{W}_{ik} = w_{ik}\bm{I}$), this issue is obviated by premultiplying the error terms by the inverse pose rotations to regain \emph{linearity} of the error terms. However, preforming this operation in the matrix-weighted case will change the cost function, since $\bm{C}_i^T\bm{W}_{ik}\bm{C}_i\neq \bm{W}_{ik}$ when $\bm{W}_{ik}$ is an arbitrary positive definite matrix.\footnote{This reflects the fact that the measurement noise \emph{has an orientation} and depends on the (unknown) observation frame. This would not be an issue if all measurements were defined in a common frame, but, in practice, measurements are typically taken in the robot's frame of reference.}
 
 In order to cast Problem \eqref{opt:landmark_SLAM} as a QCQP, we follow a similar strategy to~\cite{dumbgenSafeSmoothCertified2023} and~\cite{brialesCertifiablyGloballyOptimal2018} by introducing \textit{substitution variables}, $ \bm{m}_i^{ki} $, corresponding to each available measurement, $ \tilde{\bm{m}}_i^{ki} $. These new variables must satisfy the following (quadratic) constraints:
 \begin{equation}
-	\bm{m}_i^{ki} = \bm{C}_i\bm{m}_0^{k0} - \bm{t}_i, \quad \forall (i,k)\in\EdgeSet_m.
+	\bm{m}_i^{ki} = \bm{C}_i\bm{m}_{0,}^{k0} - \bm{t}_i, \quad \forall (i,k)\in\EdgeSet_m.
 \end{equation}
 
 When the landmarks become unknown, a gauge freedom is also introduced into the problem. This has an important implication for the SDP solution; the well-known SLAM gauge freedom results in solution symmetries that cause the rank of the SDP solution to be higher than one, even when it is numerically tight~\cite{brialesCertifiablyGloballyOptimal2018}. To fix this freedom, we assume that a \emph{prior} factor term is included in the pose-graph terms for at least one pose.\footnote{As with SLAM problems in general, the pose variable in the prior, $\tilde{\bm{T}}_{j0}$, is typically used to `lock' the solution to a known pose using some exteroceptive measurement, such as GPS. However, for our purposes it can be set arbitrarily without loss of generality.}
@@ -417,12 +417,12 @@ The optimization can now be written as
 	\hspace*{-5pt}
 	\label{opt:SLAM}
 	\begin{array}{rl} 
-		\min \limits_{ \substack{\bm{C}_i,\bm{t}_i, \\ \bm{m}_0^{k0},\bm{m}_i^{ki} \\ \forall i\in \VertSetP,~ \forall k\in\VertSetM } } & \hspace*{-20pt}\sum\limits_{(i,k)\in\EdgeSet_m} \bm{e}_{ik}^T \bm{W}_{ik} \bm{e}_{ik} + \hspace*{-7pt}\sum\limits_{(i,j)\in\EdgeSet_p}  \bm{e}_{ij}^T \bm{W}_{ij} \bm{e}_{ij}\hfill \\
+		\min \limits_{ \substack{\bm{C}_i,\bm{t}_i, \\ \bm{m}_{0,}^{k0},\bm{m}_i^{ki} \\ \forall i\in \VertSetP,~ \forall k\in\VertSetM } } & \hspace*{-20pt}\sum\limits_{(i,k)\in\EdgeSet_m} \bm{e}_{ik}^T \bm{W}_{ik} \bm{e}_{ik} + \hspace*{-7pt}\sum\limits_{(i,j)\in\EdgeSet_p}  \bm{e}_{ij}^T \bm{W}_{ij} \bm{e}_{ij}\hfill \\
 		\mbox{where} & \bm{e}_{ik} = \tilde{\bm{m}}_i^{ki} - \bm{m}_i^{ki},\\
 		&\bm{e}_{ij} = \vect{\tilde{\bm{T}}_{ij}\bm{T}_j - \bm{T}_i},\\
 		\mbox{s.t.}&\bm{C}_i^T \bm{C}_i = \bm{I},~\forall i \in \VertSetP.\\
 		& (\bm{c}_i^{1})^\times\bm{c}_i^{2} - \bm{c}_i^{3} = \bm{0},~\forall i = \VertSetP,\\
-		& \bm{m}_i^{ki} = \bm{C}_i\bm{m}_0^{k0} - \bm{t}_i, \quad \forall (i,k)\in\EdgeSet_m.
+		& \bm{m}_i^{ki} = \bm{C}_i\bm{m}_{0,}^{k0} - \bm{t}_i, \quad \forall (i,k)\in\EdgeSet_m.
 	\end{array}
 \end{equation}
 The pose-landmark cost elements can now be written in the standard form:
@@ -439,7 +439,7 @@ The pose-landmark cost elements can now be written in the standard form:
 The cost elements can be then permuted and summed according to our variable ordering,
 \begin{multline}
 	\bm{z}^T = \left[\begin{matrix}\vect{\bm{C}_{10}}^T &\bm{t}_1^{10^T} & \cdots &\vect{\bm{C}_{N_p0}}^T&\bm{t}_{N_p}^{N_p0^T} \end{matrix}\right. \\
-		\left.\begin{matrix} \bm{m}_0^{k0^T} &\cdots& \bm{m}_i^{ki^T} & \cdots & w \end{matrix}\right],
+		\left.\begin{matrix} \bm{m}_{0,}^{k0^T} &\cdots& \bm{m}_i^{ki^T} & \cdots & w \end{matrix}\right],
 \end{multline}
 and we can apply the semidefinite relaxation described in~\ref{sec:Relaxation}. However, we have observed that, contrary to the scalar case, this SDP relaxation is \emph{not tight} even for low levels of noise. A similar situation occurred in~\cite{brialesCertifiablyGloballyOptimal2018} and~\cite{yangTEASERFastCertifiable2021} when substitution variables were introduced (though not when introduced in~\cite{dumbgenSafeSmoothCertified2023}).
 
@@ -449,9 +449,37 @@ One of the key contributions of this paper is a concise set of redundant constra
 
 One approach that can be used to tighten this relaxation is to apply the Lasserre-moment hierarchy~\cite{henrionMomentSOSHierarchyLectures2021, lasserreGlobalOptimizationPolynomials2001}. However, this method often introduces a \emph{prohibitive} number of additional  variables and constraints to the problem~\cite{yangCertifiablyOptimalOutlierRobust2023}. 
 
-In constrast, we have opted to \emph{discover} a smaller set\footnote{Smaller in the sense that we do not include \emph{all} possible constraints or further ascend Lasserre's hierarchy.} of redundant constraints that is sufficient to render each of the problems above tight for reasonable levels of noise.  To do this, we leverage a \emph{constraint learning} concept from our concurrent paper, which, \emph{for a given problem instance}, uses samples that are drawn from the feasible set to numerically find all possible constraints via a nullspace argument~\cite{dumbgenGloballyOptimalState2023a}. 
+In constrast, we have opted to \emph{discover} a smaller set\footnote{Smaller in the sense that we do not include \emph{all} possible constraints or further ascend Lasserre's hierarchy.} of redundant constraints that is sufficient to render each of the problems above tight for reasonable levels of noise.  To do this, we leverage a \emph{constraint learning} concept from our concurrent paper, which, \emph{for a given problem instance}, uses samples that are drawn from the feasible set to numerically find all possible constraints via a nullspace argument~\cite{dumbgenGloballyOptimalState2023a}. \rev{This constraint learning process can be time-consuming and it is not feasible to repeat it for each new problem instance.}
 
-We applied the constraint learning method to small instances of the problems defined above. We then interpreted the numerical, learned constraints and cast them as equations that are commensurate with the properties of $\mbox{SO}(3)$ and could be extended to problems of any size (any number of landmarks and poses). Finally, we selected a subset of these constraints that were empirically found to lead to tightness across various problem instances. The concept of SDP stability~\cite{cifuentesLocalStabilitySemidefinite2022} provides \emph{some} guarantees that similar problems to the ones that we study will also be tight, though we cannot claim that \emph{any} instance of Problem \eqref{opt:SLAM} will be tight.
+\rev{Therefore, we }applied the constraint learning method to small instances of the problems defined above \rev{and } interpreted the \rev{resulting } numerical, learned constraints. \rev{We then } cast them as equations that are commensurate with the properties of $\mbox{SO}(3)$ and could be extended to problems of any size (any number of landmarks and poses). 
+
+\rev{For example, for Problem~\eqref{opt:SLAM}, we randomly initialized a problem with three poses and seven landmarks and drew samples from the feasible set. Using these samples, the methodology in~\cite{dumbgenGloballyOptimalState2023a} allowed us to find a set of (numerical) redundant constraint matrices for the problem. An example of one such constraint matrix is shown in Figure~\ref{fig:constraint_ex}. The constraint matrix corresponds to the equation $\bm{x}^T \bm{A} \bm{x} = 0$, where $\bm{A}$ is the matrix and $\bm{x}$ is a subset of variables affected by this constraint. In this case, 
+\begin{equation*}
+	\bm{x} = \begin{bmatrix}
+		w & \vect{\bm{C}_1}^T & \bm{m}^{20^T}_0 & \bm{m}^{40^T}_0 & \bm{m}^{21^T}_1 & \bm{m}^{41^T}_1
+	\end{bmatrix}^T.
+\end{equation*}
+The constraint can be interpreted as the following polynomial equation:
+\begin{align*}
+	&-  w \left[\bm{m}_1^{21}\right]_3 +   w \left[\bm{m}_1^{41}\right]_3 +   \left[  \vect{\bm{C}_1}\right]_3 \left[\bm{m}_0^{20}\right]_1 \\
+	&+ \left[  \vect{\bm{C}_1}\right]_6 \left[\bm{m}_0^{20}\right]_2 +   \left[  \vect{\bm{C}_1}\right]_9 \left[\bm{m}_0^{20}\right]_3 \\
+	& -  \left[  \vect{\bm{C}_1}\right]_3 \left[\bm{m}_0^{40}\right]_1  -  \left[  \vect{\bm{C}_1}\right]_6 \left[\bm{m}_0^{40}\right]_2 \\
+	&- \left[  \vect{\bm{C}_1}\right]_9 \left[\bm{m}_0^{40}\right]_3=0,
+\end{align*}
+where $\left[\bm{v}\right]_i$ denotes the $i^{th}$ element of vector $\bm{v}$. Further study of this equation reveals that it can be generalized as the third vector component of the following constraint:
+\begin{equation*}
+	\bm{C}_i\left(\bm{m}_{0,}^{l0}-\bm{m}_{0,}^{k0}\right) - \left(\bm{m}_i^{li}-\bm{m}_i^{ki}\right) = \bm{0},
+\end{equation*}
+which describes distances between landmarks in the world and $i^{th}$ frames. Once expressed analytically, the constraint can be applied to different problem instances than the one that was used to find them. This constraint was found to be effective in tightening other instances of Problem~\eqref{opt:SLAM} and we added it to our list of effective constraints,~\eqref{eqn:constr_ex}. Proceeding in this manner, we selected a set of constraints that were empirically found to lead to tightness across various problem instances.}
+
+\begin{figure}[!t]
+	\centering
+	\includegraphics[width=\columnwidth]{figs/constraint_ex.png}
+	\caption{\rev{Redundant constraint matrix found numerically via the method in~\cite{dumbgenGloballyOptimalState2023a}, with colors indicating the relative values of the matrix (teal: 0, yellow: 1, purple: -1). The constraint matrix corresponds to the equation $\bm{x}^T \bm{A} \bm{x} = 0$, where $\bm{x}$ is a subset of variables affected by this constraint.}}
+	\label{fig:constraint_ex}
+\end{figure}
+
+The concept of SDP stability~\cite{cifuentesLocalStabilitySemidefinite2022} provides \emph{some} guarantees that similar problems to the ones that we study will also be tight, though we cannot claim that \emph{any} instance of Problem \eqref{opt:SLAM} will be tight.
 
 We found that the following set of redundant constraints could be used to tighten Problem \eqref{opt:Localize}:
 \begin{subequations}\label{eqn:so3_constraints}
@@ -472,15 +500,15 @@ where $\bm{C}_i^{j}$ and $\bm{r}_{i0}^{k}$ represent the $j^{th}$ column and $k^
 Moreover, our SLAM problem (Problem \eqref{opt:SLAM}) can be tightened by using \eqref{eqn:so3_constraints} in conjunction with the following constraints:
 \begin{subequations}\label{eqn:slam_constraints}
 	\begin{flalign}
-		\bm{m}_0^{l0^T} \bm{m}_0^{k0} - (\bm{m}_i^{li}-\bm{t}_i)^T (\bm{m}_i^{ki}-\bm{t}_i) = 0,% landmark dot products
+		\bm{m}_{0,}^{l0^T} \bm{m}_{0,}^{k0} - (\bm{m}_i^{li}-\bm{t}_i)^T (\bm{m}_i^{ki}-\bm{t}_i) = 0,% landmark dot products
+	\end{flalign}
+	\vspace*{-20pt}
+	\begin{flalign}\label{eqn:constr_ex}
+		\bm{C}_i\left(\bm{m}_{0,}^{l0}-\bm{m}_{0,}^{k0}\right) - \left(\bm{m}_i^{li}-\bm{m}_i^{ki}\right) = \bm{0}, % landmark to landmark vector in pose frame
 	\end{flalign}
 	\vspace*{-20pt}
 	\begin{flalign}
-		\bm{C}_i\left(\bm{m}_0^{l0}-\bm{m}_0^{k0}\right) - \left(\bm{m}_i^{li}-\bm{m}_i^{ki}\right) = \bm{0}, % landmark to landmark vector in pose frame
-	\end{flalign}
-	\vspace*{-20pt}
-	\begin{flalign}
-	 	\left(\bm{m}_0^{l0}-\bm{m}_0^{k0}\right) - \bm{C}_i^T\left(\bm{m}_i^{li}-\bm{m}_i^{ki}\right) = \bm{0}, % landmark to landmark vector in world frame
+	 	\left(\bm{m}_{0,}^{l0}-\bm{m}_{0,}^{k0}\right) - \bm{C}_i^T\left(\bm{m}_i^{li}-\bm{m}_i^{ki}\right) = \bm{0}, % landmark to landmark vector in world frame
 	\end{flalign}
 	\vspace*{-20pt}
 	\begin{flalign}
@@ -488,7 +516,7 @@ Moreover, our SLAM problem (Problem \eqref{opt:SLAM}) can be tightened by using 
 	\end{flalign}
 	\vspace*{-20pt}
 	\begin{flalign}
-	 	\left(\bm{m}_0^{l0}-\bm{m}_0^{k0}\right)^{\times} \bm{C}_i - \bm{C}_i \left(\bm{m}_0^{l0}-\bm{m}_0^{k0}\right)^{\times} =\bm{0}, % Adjoint Equation
+	 	\left(\bm{m}_{0,}^{l0}-\bm{m}_{0,}^{k0}\right)^{\times} \bm{C}_i - \bm{C}_i \left(\bm{m}_{0,}^{l0}-\bm{m}_{0,}^{k0}\right)^{\times} =\bm{0}, % Adjoint Equation
 	\end{flalign}
 	\vspace*{-20pt}
 	\begin{flalign}
@@ -509,7 +537,7 @@ Due to the large number of variables and constraints that must be introduced, th
 
 In this section, we present a set of theoretical results that allows us to extend intuitions about uncertainty in state estimation to tightness of SDP relaxations. We establish a connection between the dual solution of the SDP relaxation (specifically the certificate matrix, $\bm{H}$) and the Fisher Information Matrix. 
 
-The following Lemma relates the dual SDP solution and the Laplace approximation of an equivalent (local) unconstrained problem of the form \eqref{opt:UnconstrainedMAP}. 
+The following Lemma relates the \rev{certificate matrix to} the Laplace approximation of an equivalent (local) unconstrained problem of the form \eqref{opt:UnconstrainedMAP}. \rev{Throughout this section, we will assume that we have access to the global minimum and explore properties of the associated certificate matrix.}
 
 \begin{lemma}\label{lem:FisherInfo}
 	Suppose a given MAP estimation problem can be equivalently formulated as either a standard-form, homogenized QCQP \eqref{opt:QCQP} or as an unconstrained optimization as in \eqref{opt:UnconstrainedMAP}. Let $\bm{z}^*$ and $\bm{x}^*$ be the (global) optima of these formulations, respectively. Given a neighborhood, $\mathcal{U} \subseteq \mathbb{R}^p$, containing $\bm{x}^*$, let $\bm{\ell}: \mathbb{R}^p \mapsto \mathbb{R}^n$ be a \emph{smooth, injective} map on $\mathcal{U}$, such that its image is in the feasible set of \eqref{opt:QCQP}.\footnote{The existence of the mapping, $\bm{\ell}$, is not restrictive in our context. In fact, since the feasible set of the problems in this paper are smooth manifolds, this mapping can be interpreted as the \emph{inverse coordinate chart} from differential geometry.} Moreover, let the respective objective functions be equal under the map in the neighborhood $\mathcal{U}$. That is,
@@ -520,15 +548,15 @@ The following Lemma relates the dual SDP solution and the Laplace approximation 
 	\begin{equation}\label{eqn:FIM_H}
 		\bm{\Sigma}^{-1}= \bm{L}^T \bm{H}\bm{L},
 	\end{equation}
-	where $\bm{H}$ is the dual certificate matrix at the solution and $\bm{L}$ is the Jacobian of the $\bm{\ell}(\bm{x})$ at the solution, $\bm{L} = \frac{d}{d\bm{x}}\bm{\ell}(\bm{x})\vert_{\bm{x}=\bm{x}^*}$. 
+	where $\bm{H}$ is the certificate matrix at the solution and $\bm{L}$ is the Jacobian of the $\bm{\ell}(\bm{x})$ at the solution, $\bm{L} = \frac{d}{d\bm{x}}\bm{\ell}(\bm{x})\vert_{\bm{x}=\bm{x}^*}$. 
 \end{lemma}
 We defer the proof of this Lemma to Appendix~\ref{App:lemma1Proof}. Intuitively, the Lemma uses the fact that the local curvature of the two problems are equal on the feasible set to establish a connection between the FIM and the certificate matrix. 
 
 One implication of this Lemma is that the certificate matrix can be interpreted as an information matrix in the higher-dimensional, SDP space. It also provides a method to extract posterior covariance matrices from a given SDP solution. 
 
-\rev{\subsection{Application to Wahba's Problem}
+\rev{\subsection{Application to Localization}\label{sec:fim-wahba-ex}
 
-To make the Lemma in the preceding section more concrete,  we show its application to Wahba's Problem, Problem~\eqref{opt:Localize}. The equivalent unconstrained parameterization of this problem is the Lie-algebra vector space parameterization (CITE).
+To make the Lemma in the preceding section more concrete,  we show its application to Problem~\eqref{opt:Localize}. The equivalent unconstrained parameterization of this problem is the Lie-algebra vector space parameterization (CITE).
 
 For the $i^{th}$ pose variable in Problem~\eqref{opt:Localize}, let $\bm{x}_i= \begin{bmatrix} \bm{x}_{i,r}^T & \bm{x}_{i,t}^T\end{bmatrix}^T \in \mathbb{R}^3\times\mathbb{R}^3$ be the associated variable for the unconstrained problem. We have the following relationship:
 \begin{equation}
@@ -539,7 +567,7 @@ where $\bar{\bm{C}}_i$ and $\bar{\bm{t}}_i$ are the optimal values of $\bm{C}_i$
 	\label{opt:LocalizeUnc}
 	\begin{array}{rl}
 		\min\limits_{\bm{x}_i \in \mathbb{R}^6} &\sum\limits_{(i,k)\in\EdgeSet_m} \bm{e}_{ik}^T \bm{W}_{ik} \bm{e}_{ik} \\
-		\mbox{where} & \bm{e}_{ik} = \tilde{\bm{m}}_i^{ki} - \exp(\bm{x}_{i,r}^\wedge)\bar{\bm{C}}_i\bm{m}_0^{k0} + \bm{x}_{i,t} + \bar{\bm{t}}_i,
+		\mbox{where} & \bm{e}_{ik} = \tilde{\bm{m}}_i^{ki} - \exp(\bm{x}_{i,r}^\wedge)\bar{\bm{C}}_i\bm{m}_{0,}^{k0} + \bm{x}_{i,t} + \bar{\bm{t}}_i,
 	\end{array}
 \end{equation}
 
@@ -567,33 +595,29 @@ We visualize Lemma~\ref{lem:FisherInfo} on a two-pose localization problem with 
 	\caption{\rev{Comparison of numerical covariance matrix to the theoretical covariance matrix from Theorem~\ref{lem:FisherInfo}, $\bm{\Sigma} = (\bm{L}^T\bm{H}\bm{L})^{-1}$, for a two-pose localization problem (Problem~\ref{opt:Localize}). Numerical covariance was found by considering the average sample covariance of 10000 (globally optimal) estimates.}}
 	\label{fig:num_cov}
 \end{figure}
-
-\subsection{Connection to Relaxation Tightness}
 }
-Lemma~\ref{lem:FisherInfo} can be used to relate the minimum eigenvalues of the certificate matrix and the FIM:
+\rev{\subsection{Connection to Relaxation Tightness}
+
+In this section, we aim to connect posterior estimation uncertainty to tightness of the SDP relaxation. To this end, we first present a Lemma that relates the minimum eigenvalues of the certificate matrix and the FIM.
 \begin{lemma}\label{lem:eig_bounds}
-	Assume that the setting of Lemma~\ref{lem:FisherInfo} applies. Then we have the following relation:
+	Assume that the setting of Lemma~\ref{lem:FisherInfo} applies. Without loss of generality, we assume that the homogenizing variable is the last element of $\bm{z}$. Then the certificate matrix can be partitioned as,
+	\begin{equation*}
+		\bm{H}=\begin{bmatrix}
+			\bar{\bm{H}} & \bm{h} \\ \bm{h}^T & h
+		\end{bmatrix},
+	\end{equation*}
+	and we have the following relation:
 	\begin{equation}\label{eqn:eig_bound}
-		\sigma_{\min}(\bar{\bm{H}})  \leq \frac{\sigma_{\min}(\bm{\Sigma}^{-1})}{\sigma_{\min}(\bm{L})^2}, 
+		\sigma_{\min}(\bar{\bm{H}})  \leq \frac{\sigma_{\min}(\bm{\Sigma}^{-1})}{\rev{s_{\min}(\bm{L})^2}},
 	\end{equation}
-	where $\sigma_{\min}(\cdot)$ denotes the smallest singular value (or eigenvalue for PSD matrices \rev{, $\bar{\bm{H}}$ and $\bm{\Sigma}^{-1}$}) and $\bar{\bm{H}}$ is the certificate matrix with row and column corresponding to the homogenization variable removed.
+	\rev{where $\sigma_{\min}(\cdot)$ denotes the minimum eigenvalue and $s_{\min}(\cdot)$ denotes the smallest singular value.}
 \end{lemma}
-The proof of this proposition is given in Appendix \ref{App:lem2Proof}. 
-\rev{The eigenvalue bound in \eqref{eqn:eig_bound} can be seen Figure \ref{fig:cert_eig_study}.
+The proof of this lemma is given in Appendix \ref{App:lem2Proof}. It is known that high posterior uncertainty along particular dimensions of state-estimation problems lead to degenerate (or nearly degenerate) FIMs\cite{zhangDegeneracyOptimizationbasedState2016}. If strict complementarity holds,\footnote{\rev{Strict complementarity is a property of SDPs that has been shown to hold \emph{generically}~\cite{alizadehComplementarityNondegeneracySemidefinite1997}. However, this property has been shown to fail in highly structured SDPs, such as relaxations of some combinatorial problems\cite{cifuentesLocalStabilitySemidefinite2022,silvaStrictComplementarityMaxCut2018}. Nevertheless, we have empirically observed that this property holds for the problems we consider here.}} as the FIM approaches degeneracy (i.e., its minimum eigenvalue approaches zero) it can be shown (c.f. Appendix~\ref{app:fim-degeneracy}) that either the certificate matrix has a negative eigenvalue at the global solution or the primal SDP solution is not rank-one. In either case, the practical implication in such a scenario is that tightness of the SDP relaxation is lost (regardless of the presence of redundant constraints). 
 
-This relationship between eigenvalues can be used to establish the following Theorem, which links the FIM and tightness of the SDP relaxation:
-\begin{theorem}\label{thm:tight_fim}
-Assume that the setting of Lemma~\ref{lem:FisherInfo} applies and, in addition, that strict complementarity holds for the SDP relaxation, \eqref{opt:SDP}. Then the relaxation is not tight whenever the FIM, $\Sigma^{-1}$, is degenerate (i.e. has a nullspace).
-\end{theorem}
+Our investigations in the next section imply that posterior uncertainty plays a role even when the FIM is \emph{approximately} degenerate (i.e., scenarios with high or concentrated noise), but investigation of the theoretical mechanism explaining this phenomenon is still ongoing. For example, Figure \ref{fig:cert_eig_study} shows that the minimum eigenvalue of the FIM generally upper bounds the second eigenvalue of the certificate matrix across parameters for Wahba's problem.} 
 
-\begin{remark}[Strict Complementarity]
-	The assumption of strict complementarity is required to make exact claims on the tightness of the SDP solution. Strict complementarity is a property of SDPs that has been shown to hold \emph{generically}~\cite{alizadehComplementarityNondegeneracySemidefinite1997}. However, this property has been shown to fail in highly SDPs, such as relaxations of some combinatorial problems\cite{cifuentesLocalStabilitySemidefinite2022,silvaStrictComplementarityMaxCut2018}. Nevertheless, we have empirically observed that this property holds for the problems we consider herein.
-\end{remark}
+We will see in next section that the tightness of the semidefinite relaxation degrades as the uncertainty of the optimal state-estimate increases (i.e., as the FIM becomes more degenerate). In particular, the introduction of anisotropic noise can cause accentuated uncertainty in a particular direction and erode the tightness of the semidefinite relaxation. 
 
-Degeneracy of the FIM is directly connected to high posterior uncertainty along particular dimensions of state-estimation problems \cite{zhangDegeneracyOptimizationbasedState2016}. Therefore, Theorem \ref{thm:tight_fim} establishes a connection between posterior uncertainty and relaxation tightness. 
-
-In practice, both tightness and degeneracy are continuous rather than discrete measures. We will see in next section that the tightness of the semidefinite relaxation degrades as the uncertainty of the optimal state-estimate increases. In particular, the introduction of anisotropic noise can cause accentuated uncertainty in a particular direction and erode the tightness of the semidefinite relaxation.
-}
 
 \section{Simulated Experiments}\label{sec:Simulations}
 
@@ -618,11 +642,11 @@ In this section, we directly control the level and alignment of measurement nois
 
 We first study the effect of anisotropic noise  on Wahba's problem and consider the simplified case in which all of the error ellipsoids are aligned. The alignment of the ellipsoids causes the uncertainty to be concentrated in a single direction leading to high posterior uncertainty in that direction~\cite{zhangDegeneracyOptimizationbasedState2016}. This case is of interest since our analysis in Section~\ref{sec:Uncertainty} suggests that there is a connection between high posterior uncertainty and loss of tightness. 
 
-Figure~\ref{fig:ellipsoid_align} shows the boundary between tight and nontight SDP relaxations for this problem as the standard deviation (STD) of the noise, anisotropicity of the noise  and number of landmarks are varied. The problem setup is shown in Figure~\ref{fig:ellipsoid_align}(b), while Figure~\ref{fig:ellipsoid_align}(a) demonstrates the effect of increasing anisotropicity on the uncertainty ellipsoid.
+Figure~\ref{fig:ellipsoid_align} shows the boundary between tight and non-tight SDP relaxations for this problem as the standard deviation (STD) of the noise, anisotropicity of the noise  and number of landmarks are varied. The problem setup is shown in Figure~\ref{fig:ellipsoid_align}(b), while Figure~\ref{fig:ellipsoid_align}(a) demonstrates the effect of increasing anisotropicity on the uncertainty ellipsoid.
 
 Figure~\ref{fig:ellipsoid_align} (c) and (d) show the parameter-space regions that have tight relaxations without and with (respectively) the redundant constraints in \eqref{eqn:so3_constraints}. For the case without redundant constraints, we see that when anisotropicity is close to one (i.e., nearly isotropic), the noise level that yields tight relaxations is high even for low numbers of landmarks. These results are consistent with previous results for isotropic noise~\cite{holmesEfficientGlobalOptimality2023}. Increasing the number of landmarks generally improves tightness for a given noise level. We also see that for any given level of noise, increasing anisotropicity eventually results in a loss of tightness. 
 
-It is clear that the redundant constraints effectively make the problem tight across almost all parameters studied. The effect of the redundant constraints as well as the relationship between tightness, the certificate matrix and the FIM are explored in greater depth in Figure~\ref{fig:cert_eig_study}. This figure shows heatmaps for the 50 landmark case of Figure~\ref{fig:ellipsoid_align}, without and with redundant constraints, across three metrics: the solution ER (subplots (a) and (b)), second smallest eigenvalue of the certificate matrix (subplots (c) and (d)), and the minimum eigenvalue of the FIM ((e) and (f)). The FIM was calculated using \eqref{eqn:FIM_H} with the mapping $\bm{L}$ as defined in  Appendix~\ref{App:UncEx}. 
+\rev{We observe } that the redundant constraints effectively make the problem tight across almost all parameters studied. The effect of the redundant constraints as well as the relationship between tightness, the certificate matrix and the FIM are explored in greater depth in Figure~\ref{fig:cert_eig_study}. This figure shows heatmaps for the 50 landmark case of Figure~\ref{fig:ellipsoid_align}, without and with redundant constraints, across three metrics: the solution ER (subplots (a) and (b)), second smallest eigenvalue of the certificate matrix (subplots (c) and (d)), and the minimum eigenvalue of the FIM ((e) and (f)). The FIM was calculated using \eqref{eqn:FIM_H} with the mapping $\bm{L}$ as defined in \rev{Section \ref{sec:fim-wahba-ex}}. 
 
 A number of key observations can be drawn. First, we note that the tightness boundary in (a) (magenta line)\footnote{Note that this line is the same as the same boundary as shown in Figure~\ref{fig:ellipsoid_align}(c).} coincides almost exactly with the drop in the certificate matrix eigenvalue in (c), as expected.\footnote{This actually demonstrates that strict complementarity mostly holds for this problem, since a drop in rank of the certificate is exactly complemented by an increase in rank of the solution matrix.} 
 
@@ -675,7 +699,7 @@ Levaraging our understanding from the previous section, we now turn our attentio
 Figure~\ref{fig:stereo_redun} (b) and (c) show the tightness boundaries for this setup without and with the redundant constraints given in \eqref{eqn:so3_constraints}. 
 The figure shows results for Wahba's problem with different numbers of landmarks. As expected, the level of noise for which the relaxation is tight is inversely proportional to the average distance between pose and landmarks. On the other hand, increasing the spread (bounding cube) of the landmarks increases the tightness boundary, which is consistent with our previous observations for the ellipsoid model. 
 
-Note that for this camera model, Wahba's problem is not very tight without redundant constraints: the tightness boundary when 50 landmarks are constrained to a unit cube is a range of approximately 2 m for a 0.24 m baseline camera. In constrast, the problem becomes considerably tighter when the redundant constraints are employed, with the maximum range of 100 m. This is a clear indication that redundant constraints are required for practical robotics applications. As we will see in Section~\ref{sec:OutdoorLoc}, it is feasible to use redundant constraints in this problem, while still maintaining computational efficiency. 
+Note that for this camera model, Wahba's problem is not very tight without redundant constraints: the tightness boundary when 50 landmarks are constrained to a unit cube is a range of approximately 2 m for a 0.24 m baseline camera. In constrast, the problem becomes considerably tighter when the redundant constraints are employed, with the maximum range of 100 m. This is \rev{indicates } that redundant constraints are required for practical robotics applications. As we will see in Section~\ref{sec:OutdoorLoc}, it is feasible to use redundant constraints in this problem, while still maintaining computational efficiency. 
 
 \begin{figure}[!t]
 	\centering
@@ -713,7 +737,7 @@ The full pipeline can be seen in Figure~\ref{fig:inthedark}(d). A neural network
 
 We replace the pose refinement block with a matrix-weighted optimization (i.e., Wahba's problem). A stereo-camera model is used to compute the inverse covariances of the 3D keypoint measurements (see Section~\ref{App:stereo} for details), which are then used as the matrix weights. Since the pipeline does not make use of relative-pose measurements (i.e., IMU data), each pose can be solved separately. 
 
-We solved the matrix-weighted pose-refinement optimization with both a local solver and global solver. The local optimization was performed using a Gauss-Newton solver over the $\mbox{SE}(3)$ Lie group in an off-the-shelf framework called Theseus~\cite{pinedaTheseusLibraryDifferentiable2022}. Tolerances (relative and absolute) were set to $1\times10^{-10}$ with 200 as the maximum number of iterations. The maximum number of iterations recorded was 160. Theseus was initialized using the best pose estimate from RANSAC, as is common in practice.
+We solved the matrix-weighted pose-refinement optimization with both a local solver and global solver. The local optimization was performed using a Gauss-Newton solver over the $\mbox{SE}(3)$ Lie group in an off-the-shelf framework called Theseus~\cite{pinedaTheseusLibraryDifferentiable2022}. Tolerances (relative and absolute) were set to $1\times10^{-10}$ with 200 as the maximum number of iterations. The maximum number of iterations recorded was 160. Theseus was initialized using the best pose estimate from RANSAC, as is common in practice. 
 
 The problem was solved globally via the SDP relaxation of Problem \eqref{opt:Localize} \emph{with} the redundant constraints given in \eqref{eqn:so3_constraints}. The cost matrix was computed as shown in Section~\ref{App:LocCost}. For each pose, we used CVXPY~\cite{diamondCVXPYPythonEmbeddedModeling} with Mosek~\cite{mosek} to solve the SDP. The solution was extracted by selecting the column corresponding to the homogenizing variable in the solution matrix. The relevant interior-point tolerances for Mosek were also set to $1\times10^{-10}$ with the maximum iterations set to 1000 (though the number of iterations did not exceed 30).
 
@@ -731,13 +755,13 @@ All approaches were implemented in PyTorch. Note that the entire pipeline up to 
 
 We tested the pipeline on runs 2, 11, 16, 17, 23, 28, and 35 from the `In-the-Dark' dataset, which was used for training and testing in~\cite{gridsethKeepingEyeThings2022}.\footnote{Dataset is available at \url{http://asrl.utias.utoronto.ca/datasets/2020-vtr-dataset/}. The selected runs correspond to the hold-out test runs from~\cite{gridsethKeepingEyeThings2022}.} The number of poses in each run varies, ranging between 886 and 3634, but the path taken in all runs is shown in Figure~\ref{fig:inthedark} (c). 
 
-We localize between all pairs of the seven runs (21 localizations total). Each run can be used as either the `map' or the `live' run since all are equiped with ground truth. Localization was performed for the Baseline (SVD), Local (Theseus), and Global (SDP) solvers by running the pipeline with each on an NVIDIA Tesla V100 DGXS GPU with a Intel Xeon 2.20GHz CPU. We present the aggregate results of the analysis in terms of average time per pose, longitudinal root-mean-square error (RMSE), latitudinal RMSE, and heading RMSE for each of the pipelines in Table~\ref{tbl:inthedark}. A full set of results is provided in Appendix~\ref{App:inthedarkExt}.
+We localize between all pairs of the seven runs (21 localizations total). Each run can be used as either the `map' or the `live' run since all are equiped with ground truth. Localization was performed for the Baseline (SVD), Local (Theseus), and Global (SDP) solvers by running the pipeline with each on an NVIDIA Tesla V100 DGXS GPU with a Intel Xeon 2.20GHz CPU. We present the aggregate results of the analysis in terms of average time per pose, longitudinal root-mean-square error (RMSE), latitudinal RMSE, and heading RMSE for each of the pipelines in Table~\ref{tbl:inthedark}. 
 
-It is immediately clear that the Local solver performs significantly worse than than the Baseline and Global methods. Further investigation revealed that this was because, for several poses throughout the runs, the Local solver converged to egregious local minima. An example of such a minimum can be seen in Figure~\ref{fig:inthedark}(a). As such, we have added a `filtered' row to Table~\ref{tbl:inthedark}, which provides the Local solver results when pose estimates with heading error larger than 3 deg are removed. Even when filtered, the Local solver still has the largest RMSE values, possibly due to less salient local minima.
+\rev{We observe } that, \rev{in terms of accuracy, } the Local solver performs significantly worse than the Baseline and Global methods. Further investigation revealed that this was because, for several poses throughout the runs, the Local solver converged to egregious local minima. An example of such a minimum can be seen in Figure~\ref{fig:inthedark}(a). As such, we have added a `filtered' row to Table~\ref{tbl:inthedark}, which provides the Local solver results when pose estimates with heading error larger than 3 deg are removed. Even when filtered, the Local solver still has the largest RMSE values, possibly due to less salient local minima.
 
 It is interesting that the (scalar-weighted) Baseline approach outperforms the (matrix-weighted) approaches in terms of RMSE and compute time. However, we note that the `ground truth' trajectories for each run were computed by minimizing a reprojection-based cost (see~\cite{patonBridgingAppearanceGap2016a}) and are subject to additional error, which is likely on the order of the difference between the Baseline and Global solvers ($\leq0.005$ m and $\leq0.05$ deg). Further, the fact that the neural network was trained \emph{using} the Baseline approach likely contributes to the performance difference.
 
-Finally, we call attention to the fact that, in terms of speed, the Global SDP approach was approximately as fast as the Local approach and both of these approaches ran only about 2.3 times slower than the (closed-form) Baseline solution. Given the speed (8.19 Hz) and accuracy of the SDP solver, the authors argue that it could be used for online estimation, especially if implemented in a more performant language than Python (such as C++).
+Finally, we call attention to the fact that, in terms of speed, the Global SDP approach ran only about 2.3 times slower than the (closed-form) Baseline solution. Given the speed (8.19 Hz) and accuracy of the SDP solver, the authors argue that it could be used for online estimation, especially if implemented in a more performant language than Python (such as C++).
 
 \begin{table}
 	\label{tbl:inthedark}
@@ -793,7 +817,7 @@ It is important to note that we have restricted these experiments to a low numbe
 \subsection{Discussion}
 We have shown that inclusion of matrix weights in state-estimation problems can have profound implications on the tightness of their semidefinite relaxations. In the case of Wahba's problem, matrix weights can decrease the noise level for which a given problem instance is tight to well below those found in practice. For SLAM, the introduction of matrix weights leads to a fundamental change in the formulation of the problem and the resulting formulation is not tight even for very low noise levels (without redundant constraints). 
 
-We have established a key connection between the posterior distribution of a state estimate and the dual or certificate matrix. We have also explored the relationship between the noise distribution of measurements, the posterior distribution, and the tightness of the semidefinite relaxation. Namely, anisotropicity in the underlying noise model results in nontight relaxations when uncertainty is aligned in a given direction. This effect can be counteracted (to some extent) by increasing the number and variety of measurements in the problem.
+We have established a key connection between the posterior distribution of a state estimate and the dual or certificate matrix. We have also explored the relationship between the noise distribution of measurements, the posterior distribution, and the tightness of the semidefinite relaxation. Namely, anisotropicity in the underlying noise model results in non-tight relaxations when uncertainty is aligned in a given direction. This effect can be counteracted (to some extent) by increasing the number and variety of measurements in the problem.
 
 One of the goals of our analysis was to determine whether redundant constraints are necessary for the problems considered herein. Based on the results in Sections~\ref{sec:SimWahbaStereo} and~\ref{sec:SimStereoSLAM}, redundant constraints seem to be necessary to achieve reliable robustness to noise in stereo-camera-based applications. In the case of Wahba's problem, our results in Section~\ref{sec:OutdoorLoc} show that, even with redundant constraints, the SDP is as fast as off-the-shelf local methods (i.e., Theseus), and can be used in real applications. Moreover, we have shown that even when initialized well, local methods can converge to egregious local minima. On the other hand, for matrix-weighted SLAM, the addition of even a sparse set of redundant constraints seems to be prohibitive for online use, as shown in Sections~\ref{sec:SimStereoSLAM} and~\ref{sec:stereoslam_starry}.
 
@@ -817,7 +841,7 @@ The authors would like to thank Natural Sciences and Engineering Research Counci
 
 \subsection{Proof of Lemma~\ref{lem:FisherInfo}}\label{App:lemma1Proof}
 \begin{proof}
-The Lagrangian of the QCQP \eqref{opt:QCQP} can be expressed as follows~\cite{boydConvexOptimization2004}:
+\rev{Taking inspiration from~\cite{nocedalNumericalOptimization2006}, we use a second-order Taylor approximation of the problem Lagrangian to prove our result. } The Lagrangian of the QCQP \eqref{opt:QCQP} can be expressed as follows~\cite{boydConvexOptimization2004}:
 \begin{equation*}
 	\mathcal{L}(\bm{z},\bm{\lambda}, \rho) = \bm{z}^T \left(\bm{Q} + \rho\bm{A}_0 +\sum\limits_{i=1}^{N_c} \lambda_i \bm{A}_i\right) \bm{z} - \rho.
 \end{equation*}
@@ -851,7 +875,7 @@ where $c$ is a constant. Since the FIM is exactly the Hessian of $-\log(p(\bm{x}
 \end{equation}
 \end{proof}
 
-\subsection{Proof of Theorem~\ref{lem:eig_bounds}}\label{App:lem2Proof}
+\subsection{Proof of Lemma~\ref{lem:eig_bounds}}\label{App:lem2Proof}
 
 \begin{proof}
 By assumption, we have $\bm{\Sigma}^{-1} = \bm{L}^T\bm{H}\bm{L}$. Without loss of generality, assume that the homogenizing variable of $\bm{z}$ is the last element in the vector. Since this element is always equal to one, the Jacobian of the feasible set mapping is given by $\bm{L}^T = \begin{bmatrix}
@@ -860,39 +884,58 @@ By assumption, we have $\bm{\Sigma}^{-1} = \bm{L}^T\bm{H}\bm{L}$. Without loss o
 
 Since $\bm{\ell}$ is injective, $\bar{\bm{L}}$ has full column rank. It follows that\footnote{See proof of Corollary 2.4.4 in~\cite{golubMatrixComputations2013}.}
 \begin{equation}\label{eqn:normSandwich}
-	\sigma_{\min}(\bar{\bm{L}}) \Vert\bm{v}\Vert \leq  \Vert\bar{\bm{L}}\bm{v}\Vert \leq \sigma_{\max}(\bar{\bm{L}})\Vert\bm{v}\Vert,
+	\rev{s_{\min}}(\bar{\bm{L}}) \Vert\bm{v}\Vert \leq  \Vert\bar{\bm{L}}\bm{v}\Vert \leq \rev{s_{\max}}(\bar{\bm{L}})\Vert\bm{v}\Vert,
 \end{equation}
-where $\Vert\cdot\Vert$ denotes the Euclidean norm, $\sigma_{\min}(\bar{\bm{L}})$ is the minimum singular value of $\bm{L}$, and $\sigma_{\max}(\bar{\bm{L}})$ is the maximum singular value of $\bm{L}$. We proceed using the Raleigh quotient characterization of eigenvalues, noting that both $\bm{\Sigma}^{-1}$ and $\bar{\bm{H}}$ are positive definite matrices.
+where $\Vert\cdot\Vert$ denotes the Euclidean norm, $\rev{s_{\min}}(\bar{\bm{L}})$ is the minimum singular value of $\bm{L}$, and $\rev{s_{\max}}(\bar{\bm{L}})$ is the maximum singular value of $\bm{L}$. We proceed using the Raleigh quotient characterization of eigenvalues, noting that both $\bm{\Sigma}^{-1}$ and $\bar{\bm{H}}$ are \rev{real, symmetric } matrices.
 \begin{align*}
 	\sigma_{\min}(\bar{\bm{H}}) &= \min\limits_{\bm{y}\in\mathbb{R}^n} \frac{\bm{y}^T \bar{\bm{H}} \bm{y}}{\Vert\bm{y}\Vert^2} 
 	\leq \min\limits_{\substack{\bm{y}=\bar{\bm{L}}\bm{v}\\\bm{v}\in\mathbb{R}^p}} \frac{\bm{y}^T \bar{\bm{H}} \bm{y}}{\Vert\bm{y}\Vert^2} \\&= \min\limits_{\bm{v}\in\mathbb{R}^p} \frac{\bm{v}^T \bar{\bm{L}}^T\bar{\bm{H}}\bar{\bm{L}} \bm{v}}{\Vert\bar{\bm{L}}\bm{v}\Vert^2 }  
-	\leq \min\limits_{\bm{v}\in\mathbb{R}^p} \frac{\bm{v}^T \bar{\bm{L}}^T\bar{\bm{H}}\bar{\bm{L}} \bm{v}}{\sigma_{\min}(\bar{\bm{L}})^2\Vert\bm{v}\Vert^2 } 
-	\\&= \frac{\sigma_{\min}(\bm{\Sigma}^{-1})}{\sigma_{\min}(\bar{\bm{L}})^2},
+	\leq \min\limits_{\bm{v}\in\mathbb{R}^p} \frac{\bm{v}^T \bar{\bm{L}}^T\bar{\bm{H}}\bar{\bm{L}} \bm{v}}{\rev{s_{\min}}(\bar{\bm{L}})^2\Vert\bm{v}\Vert^2 } 
+	\\&= \frac{\sigma_{\min}(\bm{\Sigma}^{-1})}{\rev{s_{\min}}(\bar{\bm{L}})^2},
 \end{align*}
 where the first inequality follows from the fact that we are restricting the feasible set of the optimization and the second follows from \eqref{eqn:normSandwich}. Finally, note that $\sigma_{\min}(\bar{\bm{L}}) = \sigma_{\min}(\bm{L})$.
 
 \end{proof}
 
+\rev{
+\subsection{Degeneracy of the FIM}\label{app:fim-degeneracy}
+\begin{proposition}
+	Assume that the setting of Lemma~\ref{lem:eig_bounds} holds and strict complementarity holds for Problem~\eqref{opt:SDP}. If the FIM is degenerate (i.e. $\sigma_{\min}(\bm{\Sigma}^{-1}) = 0$), then SDP relaxation becomes non-tight.
+\end{proposition}
+\begin{proof}
+	Let $\bm{z}^* = \begin{bmatrix} \bm{y}^T &1 \end{bmatrix}^T$ be the globally optimal solution to the QCQP, with associated certificate matrix $\bm{H}$. By definition, we have $\bm{H}\bm{z}^* = \bm{0}$. It can be shown that this implies that $\bm{h} = -\bar{\bm{H}}\bm{y}$.
+	
+	By assumption, we have that $\sigma_{\min}(\bm{\Sigma}^{-1})=0$. Thus, Lemma~\ref{lem:eig_bounds} implies that $\sigma_{\min}(\hat{\bm{H}})\leq 0$. If $\sigma_{\min}(\hat{\bm{H}})<0$ then $\sigma_{\min}(\bm{H}) < 0$ and the relaxation cannot be tight (since $\bm{z}^*$ is globally optimal). On the other hand, if $\sigma_{\min}(\bm{H}) \geq 0$ then we have $\sigma_{\min}(\bar{\bm{H}}) = 0$. By Lemma~\ref{lem:eig_bounds}, there exists a vector $\bm{y}_1$ such that $\bm{\bar{H}}\bm{y}_1=\bm{0}$. 
+
+	Let $\bm{z}_1 = \begin{bmatrix} \bm{y}_1^T &0 \end{bmatrix}^T$. It follows that,
+	\begin{equation*}
+		\bm{H}\bm{z}_1 = \begin{bmatrix}
+			\bm{\bar{H}}\bm{y}_1 \\ \bm{y}_0^T\bm{\bar{H}}\bm{y}_1
+		\end{bmatrix} = 0
+	\end{equation*}
+	Moreover, we have that $\bm{z}_0$ and $\bm{z}_1$ are linearly independent, which implies that $\bm{H}$ must have two minimum eigenvalues at zero (that is, the original QCQP is degenerate). By strict complementarity, the corresponding primal SDP solution will have rank equal to two and is therefore not tight.
+\end{proof}
+}
+
 \subsection{Cost Function Elements}\label{App:LocCost}
 
 In this section, we show how to determine the QCQP cost matrices for the localization and SLAM problems given in Sections~\ref{sec:Localization} and~\ref{sec:SLAM}. Throughout this section, we use the facts that $ \tr{\bm{A}\bm{B}\bm{C}} = (\bm{C}^T\otimes\bm{A}) \vect{\bm{B}}$, $ \bm{A} = 1\otimes\bm{A} $, and $ (\bm{A}\otimes\bm{B})(\bm{C}\otimes\bm{D}) = (\bm{AC}\otimes\bm{BD}) $\cite{magnusMatrixDifferentialCalculus2019}. 
-
 
 \subsubsection{Landmark Measurements}
 
 Consider a single cost element corresponding to an edge in $\EdgeSet_m $:
 \begin{align*}
-	J_{ik}=&(\tilde{\bm{m}}_i^{ki} - \bm{C}_i\bm{m}_0^{k0} + \bm{t}_i)^T \bm{W}_k (\tilde{\bm{m}}_i^{ki} - \bm{C}_i\bm{m}_0^{k0} + \bm{t}_i) \\
-	=& \tilde{\bm{m}}_i^{ki^T}\bm{W}_k\tilde{\bm{m}}_i^{ki} w^2 - 2 w\tilde{\bm{m}}_i^{ki^T}\bm{W}_k\bm{C}_i\bm{m}_0^{k0}  \\
-	&+ 2 w\tilde{\bm{m}}_i^{ki^T}\bm{W}_k\bm{t}_i -2\bm{m}_0^{k0^T}\bm{C}_i^T\bm{W}_k\bm{t}_i\\
-	& + \bm{m}_0^{k0^T}\bm{C}_i^T\bm{W}_k\bm{C}_i\bm{m}_0^{k0} + \bm{t}_i^T\bm{W}_k\bm{t}_i,
+	J_{ik}=&(\tilde{\bm{m}}_i^{ki} - \bm{C}_i\bm{m}_{0,}^{k0} + \bm{t}_i)^T \bm{W}_k (\tilde{\bm{m}}_i^{ki} - \bm{C}_i\bm{m}_{0,}^{k0} + \bm{t}_i) \\
+	=& \tilde{\bm{m}}_i^{ki^T}\bm{W}_k\tilde{\bm{m}}_i^{ki} w^2 - 2 w\tilde{\bm{m}}_i^{ki^T}\bm{W}_k\bm{C}_i\bm{m}_{0,}^{k0}  \\
+	&+ 2 w\tilde{\bm{m}}_i^{ki^T}\bm{W}_k\bm{t}_i -2\bm{m}_{0,}^{k0^T}\bm{C}_i^T\bm{W}_k\bm{t}_i\\
+	& + \bm{m}_{0,}^{k0^T}\bm{C}_i^T\bm{W}_k\bm{C}_i\bm{m}_{0,}^{k0} + \bm{t}_i^T\bm{W}_k\bm{t}_i,
 \end{align*}
 Re-organizing terms, we see that this cost element can be written as $J_{ik}~=~\bm{x}^T\bm{Q}_{ik}\bm{x}_i$, where $ \bm{x}_i^T = \begin{bmatrix} \bm{c}_i^T &  \bm{t}_i^T & w \end{bmatrix} $ and $ \bm{c}_i=\vect{\bm{C}_i} $.
 \begin{equation*}
 	\resizebox{0.98\columnwidth}{!}{$\bm{Q}_{ik}=\begin{bmatrix}
-			\bm{m}_0^{k0}\bm{m}_0^{k0^T} \otimes \bm{W}_k  & -\bm{m}_0^{k0}\otimes\bm{W}_k & -\bm{m}_0^{k0}\otimes\bm{W}_k\tilde{\bm{m}}_i^{ki}\\
-			 -\bm{m}_0^{k0^T}\otimes\bm{W}_k & \bm{W}_k & \bm{W}_k\tilde{\bm{m}}_i^{ki} \\
-			-\bm{m}_0^{k0^T}\otimes\tilde{\bm{m}}_i^{ki^T}\bm{W}_k & \tilde{\bm{m}}_i^{ki^T}\bm{W}_k & \tilde{\bm{m}}_i^{ki^T}\bm{W}_k\tilde{\bm{m}}_i^{ki}
+			\bm{m}_{0,}^{k0}\bm{m}_{0,}^{k0^T} \otimes \bm{W}_k  & -\bm{m}_{0,}^{k0}\otimes\bm{W}_k & -\bm{m}_{0,}^{k0}\otimes\bm{W}_k\tilde{\bm{m}}_i^{ki}\\
+			 -\bm{m}_{0,}^{k0^T}\otimes\bm{W}_k & \bm{W}_k & \bm{W}_k\tilde{\bm{m}}_i^{ki} \\
+			-\bm{m}_{0,}^{k0^T}\otimes\tilde{\bm{m}}_i^{ki^T}\bm{W}_k & \tilde{\bm{m}}_i^{ki^T}\bm{W}_k & \tilde{\bm{m}}_i^{ki^T}\bm{W}_k\tilde{\bm{m}}_i^{ki}
 		\end{bmatrix}.$}
 \end{equation*}
 
@@ -973,7 +1016,7 @@ Given this measurement, we can use the (known) intrinsic camera parameters to ge
 	 	\frac{p_{ul}-c_u}{d} \\ \frac{p_{vl}-c_v}{d} \\ \frac{f_u}{d} 
 	 \end{bmatrix}.
 \end{equation}
-Although this transformation is nonlinear, we make the assumption that the distribution of $ \hat{\bm{x}} $ remains Gaussian. To approximate the covariance of the pseudo-measurement, we map the intermediate measurement covariance through the linearized Jacobian of this transformation:
+Although this transformation is non-linear, we make the assumption that the distribution of $ \hat{\bm{x}} $ remains Gaussian. To approximate the covariance of the pseudo-measurement, we map the intermediate measurement covariance through the linearized Jacobian of this transformation:
 \begin{equation}
 	\bm{G} = \frac{\partial \bm{g}^{-1}(\bm{y})}{\partial \bm{y}} = b\begin{bmatrix}
 		\frac{1}{d} & 0 & -\frac{p_{ul} - c_u}{d^2} \\
@@ -1006,7 +1049,7 @@ In this section, we prove that Problem \eqref{opt:Localize} enjoys the property 
 \begin{definition}[Noise-free Measurements]
 	Given the setting of Problem \eqref{opt:Localize}, we define the set of \emph{noise-free measurements} for a given set of poses, $\left\{(\bar{\bm{C}}_{i}, \bar{\bm{t}}_i) ~ \forall i \in \VertSetP \right\}$, as
 	\begin{equation}
-		\left\{\bar{\bm{m}}_i^{ki} = \bar{\bm{C}}_{i} \bm{m}_0^{k0} - \bar{\bm{t}}_i,~ \forall (i,k)\in \EdgeSet_m\right\},
+		\left\{\bar{\bm{m}}_i^{ki} = \bar{\bm{C}}_{i} \bm{m}_{0,}^{k0} - \bar{\bm{t}}_i,~ \forall (i,k)\in \EdgeSet_m\right\},
 	\end{equation}
 	and collect all such measurements in a vector, $\bar{\bm{m}}$.
 \end{definition}
@@ -1032,7 +1075,7 @@ We can write $\bm{e}_{ik}$ as an affine function of $\bm{y}$
 \begin{equation}
 	\bm{e}_{ik} = \tilde{\bm{m}}_i^{ki} - \bm{A}_k \bm{y}, ~\forall ~(i,k)\in \EdgeSet_m,
 \end{equation}
-where $\bm{A}_k = \begin{bmatrix} \bm{m}_0^{k0^T}\otimes\bm{I}& -\bm{I} \end{bmatrix}\in\mathbb{R}^{3\times12}$. The cost function becomes 
+where $\bm{A}_k = \begin{bmatrix} \bm{m}_{0,}^{k0^T}\otimes\bm{I}& -\bm{I} \end{bmatrix}\in\mathbb{R}^{3\times12}$. The cost function becomes 
 \begin{equation}
 	f_i(\tilde{\bm{m}},\bm{y}) = \bm{y}^T \bm{Q} \bm{y} + \bm{b}^T \bm{y} + c, 
 \end{equation}
@@ -1056,17 +1099,17 @@ where
 	\bm{A} = \begin{bmatrix}
 		 \bm{A}_1 \\ \vdots \\ \bm{A}_N
 	\end{bmatrix} = \begin{bmatrix}
-		 \bm{m}_0^{10^T} & 1 \\
+		 \bm{m}_{0,}^{10^T} & 1 \\
 		 \vdots& \vdots\\
-		 \bm{m}_0^{N0^T} & 1
+		 \bm{m}_{0,}^{N0^T} & 1
 	\end{bmatrix}\otimes \bm{I}_3,
 \end{gather}
 and we have re-indexed the landmarks from $1$ to $N$ for convenience. We also define
 \begin{equation*}
 	\bm{B} = \begin{bmatrix}
-		\bm{m}_0^{10^T} & 1 \\
+		\bm{m}_{0,}^{10^T} & 1 \\
 		\vdots&\vdots\\
-		\bm{m}_0^{N0^T} & 1
+		\bm{m}_{0,}^{N0^T} & 1
 	\end{bmatrix}.
 \end{equation*}
 Since $\bm{W}$ is full rank, we are required to show that $\rank{\bm{A}} = 12$. 
@@ -1074,12 +1117,12 @@ Recall that the singular values  of a Kronecker product, $\bm{A}\otimes\bm{B}$, 
 Therefore, $\rank{\bm{A}} = 12$ is equivalent to the fact that $\rank{\bm{B}}=4$. We can subtract the first row from the remaining rows of $\bm{B}$ without changing its row rank. Thus,
 \begin{equation*}
 	\rank{\bm{B}} = \rank{\begin{bmatrix}
-			\bm{m}_0^{10^T} & 1 \\
+			\bm{m}_{0,}^{10^T} & 1 \\
 			\bm{D} & \bm{0}
 		\end{bmatrix}}, ~ \bm{D} = \begin{bmatrix}
-		(\bm{m}_0^{20}-\bm{m}_0^{10})^T  \\
+		(\bm{m}_{0,}^{20}-\bm{m}_{0,}^{10})^T  \\
 		\vdots\\
-		(\bm{m}_0^{N0}-\bm{m}_0^{10})^T 
+		(\bm{m}_{0,}^{N0}-\bm{m}_{0,}^{10})^T 
 	\end{bmatrix}.\\	
 \end{equation*}
 Since the landmarks are not coplanar by assumption, $\rank{\bm{D}}=3$ and, since $\rank{\bm{B}} = \rank{\bm{D}} + 1$, condition~\ref{thm1:cond3} holds.
@@ -1087,7 +1130,7 @@ Since the landmarks are not coplanar by assumption, $\rank{\bm{D}}=3$ and, since
 Finally, the ACQ holds at any feasible point by the argument given in~\cite{cifuentesLocalStabilitySemidefinite2022}, giving the final condition of Theorem 3.9.
 \end{proof}
 
-We conclude this section with two remarks. First, the assumption that the weight matrices are positive definite (i.e., not degenerate) is not strictly required as long as $\rank{\bm{A}^T \bm{W} \bm{A}}=12$ is guaranteed by sufficient measurements. As mentioned above, degenerate weight matrices were encountered in~\cite{brialesConvexGlobal3D2017} when measurements of lines and planes were considered. Second, the extension of this proof to include relative-pose measurements should be straightforward since it has already been proved when \emph{only} relative-pose measurements are considered (at least for the case of a weakly connected measurement graph)~\cite{rosenSESyncCertifiablyCorrect2019}.
+We conclude this section with two remarks. First, the assumption that the weight matrices are positive definite (i.e., not degenerate) is not strictly required as long as $\rank{\bm{A}^T \bm{W} \bm{A}}=12$ is guaranteed by sufficient measurements. As mentioned above, degenerate weight matrices were encountered in~\cite{brialesConvexGlobal3D2017} when measurements of lines and planes were considered. Second, the extension of this proof to include relative-pose measurements should be \rev{possible} since it has already been proved when \emph{only} relative-pose measurements are considered (at least for the case of a weakly connected measurement graph)~\cite{rosenSESyncCertifiablyCorrect2019}.
 
 % \input{multi_pos_loc.tex}
 

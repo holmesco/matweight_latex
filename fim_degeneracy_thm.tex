@@ -1,0 +1,26 @@
+\begin{theorem}[FIM and Relaxation Tightness]\label{thm:tight_fim}
+    Assume that the setting of Lemma~\ref{lem:FisherInfo} applies and, in addition, that strict complementarity holds for the SDP relaxation, Problem \eqref{opt:SDP}. Then the relaxation is not tight whenever the FIM, $\Sigma^{-1}$, is degenerate (i.e. has a nullspace). That is,
+    \begin{equation}
+        \mbox{null}(\Sigma^{-1}) \neq \varnothing \implies \rank{\bm{Z}^*}>1,
+    \end{equation}
+\end{theorem}
+
+\subsection{Proof of Theorem~\ref{thm:tight_fim}}
+\begin{proof}
+Assume, for the sake of contradiction, that the FIM is degenerate and the problem is tight. If the FIM is degenerate, then it has a nullspace and its minimum eigenvalue must be null, $\sigma_{\min}(\bm{\Sigma}^{-1}) = 0$.  Since the problem is tight, the certificate matrix is posititive semidefinite, implying that $\sigma_{\min}(\bar{\bm{H}})$ is also positive semidefinite. Thus, by Lemma \ref{lem:eig_bounds}, we have that $\sigma_{\min}(\bar{\bm{H}}) = 0$ meaning that its nullspace is non-empty. 
+
+We now show that the optimal dual matrix, $\bm{H}$, has a nullspace with dimension greater than one. Let $\bm{Z}$ be the optimal primal solution. From complementary slackness of the optimal pair, we have $\bm{H}\bm{Z} = \bm{0}$. Let $\bm{z}_1 = \begin{bmatrix} \bm{z}_1'^T & 1\end{bmatrix}^T$ be the rightmost column of $\bm{Z}$ and note that $\bm{z}_1 \in \mbox{null}(\bm{H})$. Without loss of generality, let
+\begin{equation*}
+	\bm{H}=\begin{bmatrix}
+		\bar{\bm{H}} & \bm{h} \\ \bm{h} & h
+	\end{bmatrix}
+\end{equation*}
+and, since $\bm{H}\bm{z}_1=\bm{0}$, we have $\bm{h} = -\bar{\bm{H}}\bm{z}_1'$.
+Now, let $\bm{z}_2' \in\mbox{null}(\bar{\bm{H}}) $ and define $\bm{z}_2 = \begin{bmatrix} \bm{z}_2'^T & 0\end{bmatrix}^T$ so that
+\begin{equation*}
+\bm{H}\bm{z}_2 = \begin{bmatrix} \bar{\bm{H}}\bm{z}_2'\\ -\bm{z}_1'^T\bar{\bm{H}}^T\bm{z}_2' \end{bmatrix} = \bm{0}.
+\end{equation*}
+That is, $\bm{z}_2 \in \mbox{null}(\bm{H})$, and, since $\bm{z}_1$ and $\bm{z}_2$ are linearly independent, it must be the case that $\mbox{corank}(\bm{H})>1$.
+
+Finally strict complementarity implies that $\rank{\bm{Z}} = \mbox{corank}(\bm{H})>1$, which contradicts our statement that the relaxation is tight.
+\end{proof}
